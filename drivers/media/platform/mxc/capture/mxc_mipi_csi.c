@@ -953,9 +953,13 @@ static int mipi_csis_parse_dt(struct platform_device *pdev,
 				 &state->max_num_lanes))
 		return -EINVAL;
 
-	node = of_graph_get_next_endpoint(node, NULL);
+	/*
+	 * Explicitly get endpoint 1 being the sensor one as using overlays may
+	 * reverse node order in the final device tree blob.
+	 */
+	node = of_graph_get_endpoint_by_regs(node, 0, 1);
 	if (!node) {
-		dev_err(&pdev->dev, "No port node at %s\n",
+		dev_err(&pdev->dev, "No port/endpoint 1 sensor node at %s\n",
 				pdev->dev.of_node->full_name);
 		return -EINVAL;
 	}
@@ -987,44 +991,44 @@ static const struct v4l2_async_notifier_operations mxc_mipi_csi_subdev_ops = {
 static int mipi_csis_subdev_host(struct csi_state *state)
 {
 	struct device_node *parent = state->dev->of_node;
-	struct device_node *node, *port, *rem;
+	struct device_node *node, *rem;
 	struct v4l2_async_connection *asd;
 	int ret;
 
 	v4l2_async_nf_init(&state->subdev_notifier, &state->v4l2_dev);
 
-	/* Attach sensors linked to csi receivers */
-	for_each_available_child_of_node(parent, node) {
-		if (of_node_cmp(node->name, "port"))
-			continue;
-
-		/* The csi node can have only port subnode. */
-		port = of_get_next_child(node, NULL);
-		if (!port)
-			continue;
-		rem = of_graph_get_remote_port_parent(port);
-		of_node_put(port);
-		if (rem == NULL) {
-			v4l2_info(&state->v4l2_dev,
-						"Remote device at %s not found\n",
-						port->full_name);
-			return -1;
-		}
-
-		state->fwnode = of_fwnode_handle(rem);
-		asd = v4l2_async_nf_add_fwnode(&state->subdev_notifier,
-						state->fwnode,
-						struct v4l2_async_connection);
-		if (IS_ERR(asd)) {
-			of_node_put(rem);
-			dev_err(state->dev, "failed to add subdev to a notifier\n");
-			return PTR_ERR(asd);
-		}
-
-		of_node_put(rem);
-		break;
+	/*
+	 * Explicitly get endpoint 1 being the sensor one as using overlays may
+	 * reverse node order in the final device tree blob.
+	 */
+	node = of_graph_get_endpoint_by_regs(parent, 0, 1);
+	if (node == NULL) {
+		v4l2_info(&state->v4l2_dev,
+					"Port at %s not found\n",
+					parent->full_name);
+		return -1;
 	}
 
+	rem = of_graph_get_remote_port_parent(node);
+	of_node_put(node);
+	if (rem == NULL) {
+		v4l2_info(&state->v4l2_dev,
+					"Remote device at %s not found\n",
+					node->full_name);
+		return -1;
+	}
+
+	state->fwnode = of_fwnode_handle(rem);
+	asd = v4l2_async_nf_add_fwnode(&state->subdev_notifier,
+				       state->fwnode,
+				       struct v4l2_async_connection);
+	if (IS_ERR(asd)) {
+		of_node_put(rem);
+		dev_err(state->dev, "failed to add subdev to a notifier\n");
+		return PTR_ERR(asd);
+	}
+
+	of_node_put(rem);
 
 	state->subdev_notifier.v4l2_dev = &state->v4l2_dev;
 	state->subdev_notifier.ops = &mxc_mipi_csi_subdev_ops;
