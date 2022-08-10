@@ -173,6 +173,14 @@
 	temperature = <105000>;
 };
 
+/* We don't enable the dsp, so don't reserve 32MB for it */
+/delete-node/ &dsp;
+/delete-node/ &dsp_reserved;
+/delete-node/ &dsp_reserved_heap;
+/delete-node/ &dsp_vdev0vring0;
+/delete-node/ &dsp_vdev0vring1;
+/delete-node/ &dsp_vdev0buffer;
+
 /* Verdin SPI_1 */
 &ecspi1 {
 	#address-cells = <1>;
