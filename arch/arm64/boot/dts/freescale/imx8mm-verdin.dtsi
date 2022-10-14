@@ -153,8 +153,10 @@
 		#size-cells = <2>;
 		ranges;
 
-		/* Use the kernel configuration settings instead */
-		/delete-node/ linux,cma;
+		linux,cma {
+			size = <0 0x20000000>;
+			/delete-node/ alloc-ranges;
+		};
 	};
 };
 
