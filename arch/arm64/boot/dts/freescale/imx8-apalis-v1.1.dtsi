@@ -18,7 +18,7 @@
 		brightness-levels = <0 45 63 88 119 158 203 255>;
 		default-brightness-level = <4>;
 		enable-gpios = <&lsio_gpio1 4 GPIO_ACTIVE_HIGH>; /* Apalis BKL1_ON */
-		/* TODO: hook-up to Apalis BKL1_PWM */
+		pwms = <&pwm_lvds1 0 6666667 PWM_POLARITY_INVERTED>;
 		status = "disabled";
 	};
 
@@ -31,12 +31,39 @@
 				      3000 1>;
 	};
 
-	/* TODO: LVDS Panel */
+	panel_lvds: panel-lvds {
+		compatible = "panel-lvds";
+		backlight = <&backlight>;
+		status = "disabled";
+	};
 
-	/* TODO: Shared PCIe/SATA Reference Clock */
+<<<<<<< Updated upstream
+	pcie_sata_refclk: sata-clock-generator {
+		compatible = "fixed-clock";
+		#clock-cells = <0>;
+		clock-frequency = <100000000>;
+	};
 
-	/* TODO: PCIe Wi-Fi Reference Clock */
+	pcie_sata_refclk_gate: sata-ref-clock {
+		compatible = "gpio-gate-clock";
+		#clock-cells = <0>;
+		clocks = <&pcie_sata_refclk>;
+		enable-gpios = <&lsio_gpio4 11 GPIO_ACTIVE_HIGH>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_pcie_sata_refclk>;
+	};
 
+	pcie_wifi_refclk_gate: wifi-ref-clock {
+		compatible = "gpio-gate-clock";
+		#clock-cells = <0>;
+		clocks = <&pcie_sata_refclk_gate>;
+		enable-gpios = <&lsio_gpio2 11 GPIO_ACTIVE_HIGH>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_pcie_wifi_refclk>;
+	};
+
+=======
+>>>>>>> Stashed changes
 	/*
 	 * Power management bus used to control LDO1OUT of the
 	 * second PMIC PF8100. This is used for controlling voltage levels of
@@ -221,7 +248,13 @@
 		};
 	};
 
-	/* TODO: HDMI Audio */
+	sound_hdmi: sound-hdmi {
+		compatible = "fsl,imx-audio-hdmi";
+		audio-cpu = <&sai5>;
+		hdmi-out;
+		model = "imx-audio-hdmi-tx";
+		status = "disabled";
+	};
 
 	/* Apalis SPDIF1 */
 	sound-spdif {
@@ -262,14 +295,14 @@
 &adc0 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_adc0>;
+	vref-supply = <&reg_vref_1v8>;
 };
 
 &adc1 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_adc1>;
+	vref-supply = <&reg_vref_1v8>;
 };
-
-/* TODO: Asynchronous Sample Rate Converter (ASRC) */
 
 &cpu_alert0 {
 	temperature = <95000>;
@@ -301,6 +334,7 @@
 	pinctrl-0 = <&pinctrl_fec1>;
 	pinctrl-1 = <&pinctrl_fec1_sleep>;
 	fsl,magic-packet;
+	fsl,mii-exclusive;
 	phy-handle = <&ethphy0>;
 	phy-mode = "rgmii-id";
 
@@ -322,6 +356,14 @@
 	};
 };
 
+&gpu_3d0{
+	status = "okay";
+};
+
+&gpu_3d1{
+	status = "okay";
+};
+
 /* Apalis CAN1 */
 &flexcan1 {
 	pinctrl-names = "default";
@@ -340,7 +382,22 @@
 	pinctrl-0 = <&pinctrl_flexcan3>;
 };
 
-/* TODO: Apalis HDMI1 */
+/* Apalis HDMI1 */
+&hdmi {
+	compatible = "cdn,imx8qm-hdmi";
+	firmware-name = "hdmitxfw.bin";
+	/* 0: no HDCP, bitset: bit0: HDCP 1.4, bit1: HDCP 2.2 */
+	hdcp-config = <0x0>;
+	lane-mapping = <0x93>;
+};
+
+&hsio_refa_clk {
+	status = "disabled";
+};
+
+&hsio_refb_clk {
+	status = "disabled";
+};
 
 &gpu_alert0 {
 	temperature = <95000>;
@@ -435,6 +492,10 @@
 	clock-frequency = <100000>;
 };
 
+&imx8_gpu_ss {
+	status = "okay";
+};
+
 &jpegdec {
 	status = "okay";
 };
@@ -442,8 +503,6 @@
 &jpegenc {
 	status = "okay";
 };
-
-/* TODO: Apalis LVDS1 */
 
 /* Apalis SPI1 */
 &lpspi0 {
@@ -770,22 +829,68 @@
 
 /* Messaging Units */
 &mu_m0 {
-	status = "okay";
+	interrupts = <GIC_SPI 472 IRQ_TYPE_LEVEL_HIGH>;
 };
 
 &mu1_m0 {
-	status = "okay";
+	interrupts = <GIC_SPI 473 IRQ_TYPE_LEVEL_HIGH>;
 };
 
 &mu2_m0 {
 	status = "okay";
 };
 
-/* TODO: Apalis PCIE1 */
+/* Apalis PCIE1 */
+&pciea {
+	clocks = <&pciea_lpcg 0>,
+		 <&pciea_lpcg 1>,
+		 <&pciea_lpcg 2>,
+		 <&phyx2_lpcg 0>,
+		 <&phyx2_crr0_lpcg 0>,
+		 <&pciea_crr2_lpcg 0>,
+		 <&misc_crr5_lpcg 0>,
+		 <&pcie_sata_refclk_gate>;
+	clock-names = "pcie", "pcie_bus", "pcie_inbound_axi",
+		      "pcie_phy", "phy_per", "pcie_per", "misc_per",
+		      "pcie_ext";
+	ext_osc = <1>;
+	fsl,max-link-speed = <1>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_reset_moci>;
+	reset-gpio = <&lsio_gpio0 30 GPIO_ACTIVE_LOW>;
+	vpcie-supply = <&reg_pcie_switch>;
+};
 
-/* TODO: On-module Wi-Fi */
+/* On-module Wi-Fi */
+&pcieb {
+	clocks = <&pcieb_lpcg 0>,
+		 <&pcieb_lpcg 1>,
+		 <&pcieb_lpcg 2>,
+		 <&phyx2_lpcg 1>,
+		 <&phyx2_lpcg 0>,
+		 <&phyx2_crr0_lpcg 0>,
+		 <&pcieb_crr3_lpcg 0>,
+		 <&pciea_crr2_lpcg 0>,
+		 <&misc_crr5_lpcg 0>,
+		 <&pcie_wifi_refclk_gate>;
+	clock-names = "pcie", "pcie_bus", "pcie_inbound_axi",
+		      "pcie_phy", "pcie_phy_pclk", "phy_per",
+		      "pcie_per", "pciex2_per", "misc_per",
+		      "pcie_ext";
+	epdev_on-supply = <&reg_module_wifi>;
+	ext_osc = <1>;
+	fsl,max-link-speed = <1>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_pcieb &pinctrl_wifi>;
+	reset-gpio = <&lsio_gpio5 0 GPIO_ACTIVE_LOW>;
+	status = "okay";
+};
 
-/* TODO: Apalis BKL1_PWM */
+&pwm_lvds1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_pwm_bkl>;
+	#pwm-cells = <3>;
+};
 
 /* Apalis DAP1 */
 &sai1 {
@@ -800,7 +905,29 @@
 	status = "okay";
 };
 
-/* TODO: Apalis SATA1 */
+/* Apalis SATA1 */
+&sata {
+	clocks = <&sata_lpcg 0>,
+		 <&phyx1_lpcg 0>,
+		 <&phyx1_lpcg 1>,
+		 <&phyx1_lpcg 2>,
+		 <&phyx2_crr0_lpcg 0>,
+		 <&phyx1_crr1_lpcg 0>,
+		 <&pciea_crr2_lpcg 0>,
+		 <&pcieb_crr3_lpcg 0>,
+		 <&sata_crr4_lpcg 0>,
+		 <&misc_crr5_lpcg 0>,
+		 <&phyx2_lpcg 0>,
+		 <&phyx2_lpcg 1>,
+		 <&phyx1_lpcg 3>,
+		 <&pcie_sata_refclk_gate>;
+	clock-names = "sata", "sata_ref", "epcs_tx", "epcs_rx",
+		      "per_clk0", "per_clk1", "per_clk2",
+		      "per_clk3", "per_clk4", "per_clk5",
+		      "phy_pclk0", "phy_pclk1", "phy_apbclk",
+		      "sata_ext";
+	ext_osc = <1>;
+};
 
 /* Apalis SPDIF1 */
 &spdif0 {
@@ -813,9 +940,49 @@
 	status = "okay";
 };
 
-/* TODO: Thermal Zones */
+&thermal_zones {
+	pmic-thermal0 {
+		polling-delay-passive = <250>;
+		polling-delay = <2000>;
+		thermal-sensors = <&tsens IMX_SC_R_PMIC_0>;
 
-/* TODO: Apalis USBH2, Apalis USBH3 and on-module Wi-Fi via on-module HSIC Hub */
+		cooling-maps {
+			cooling_maps_map0: map0 {
+				trip = <&pmic_alert0>;
+			};
+		};
+
+		trips {
+			pmic_alert0: trip0 {
+				hysteresis = <2000>;
+				temperature = <110000>;
+				type = "passive";
+			};
+
+			pmic_crit0: trip1 {
+				hysteresis = <2000>;
+				temperature = <125000>;
+				type = "critical";
+			};
+		};
+	};
+};
+
+/* Apalis USBH2, Apalis USBH3 and on-module Wi-Fi via on-module HSIC Hub */
+&usbh1 {
+	adp-disable;
+	disable-over-current;
+	hnp-disable;
+	pinctrl-names = "idle", "active";
+	pinctrl-0 = <&pinctrl_usb_hsic_idle>;
+	pinctrl-1 = <&pinctrl_usb_hsic_active>;
+	srp-disable;
+	status = "disabled";
+};
+
+&usbphynop2 {
+	status = "okay";
+};
 
 /* Apalis USBH4 */
 &usb3_phy {
@@ -840,6 +1007,7 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_usbotg1>;
 	adp-disable;
+	ci-disable-lpm;
 	hnp-disable;
 	over-current-active-low;
 	power-active-high;
