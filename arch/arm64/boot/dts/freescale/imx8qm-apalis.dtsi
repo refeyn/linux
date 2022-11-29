@@ -25,7 +25,10 @@
 	phy-mode = "rgmii-rxid";
 };
 
-/* TODO: Apalis HDMI1 */
+/* Apalis HDMI1 */
+&hdmi {
+	ddc-i2c-bus = <&i2c0>;
+};
 
 /* Apalis I2C2 (DDC) */
 &i2c0 {
@@ -318,8 +321,6 @@
 	fsl,pins =
 		<IMX8QM_PCIE_CTRL0_CLKREQ_B_LSIO_GPIO4_IO27			0x00000021>;
 };
-
-/* TODO: On-module Wi-Fi */
 
 /* Apalis MMC1 */
 &usdhc2 {

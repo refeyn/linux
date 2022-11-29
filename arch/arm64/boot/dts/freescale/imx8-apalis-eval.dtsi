@@ -30,9 +30,141 @@
 	status = "okay";
 };
 
-/* TODO: Display Controller */
+&dc0_dpr1_channel1 {
+	status = "okay";
+};
 
-/* TODO: DPU */
+&dc0_dpr1_channel2 {
+	status = "okay";
+};
+
+&dc0_dpr1_channel3 {
+	status = "okay";
+};
+
+&dc0_dpr2_channel1 {
+	status = "okay";
+};
+
+&dc0_dpr2_channel2 {
+	status = "okay";
+};
+
+&dc0_dpr2_channel3 {
+	status = "okay";
+};
+
+&dc0_pc {
+	status = "okay";
+};
+
+&dc0_prg1 {
+	status = "okay";
+};
+
+&dc0_prg2 {
+	status = "okay";
+};
+
+&dc0_prg3 {
+	status = "okay";
+};
+
+&dc0_prg4 {
+	status = "okay";
+};
+
+&dc0_prg5 {
+	status = "okay";
+};
+
+&dc0_prg6 {
+	status = "okay";
+};
+
+&dc0_prg7 {
+	status = "okay";
+};
+
+&dc0_prg8 {
+	status = "okay";
+};
+
+&dc0_prg9 {
+	status = "okay";
+};
+
+&dc1_dpr1_channel1 {
+	status = "okay";
+};
+
+&dc1_dpr1_channel2 {
+	status = "okay";
+};
+
+&dc1_dpr1_channel3 {
+	status = "okay";
+};
+
+&dc1_dpr2_channel1 {
+	status = "okay";
+};
+
+&dc1_dpr2_channel2 {
+	status = "okay";
+};
+
+&dc1_dpr2_channel3 {
+	status = "okay";
+};
+
+&dc1_pc {
+	status = "okay";
+};
+
+&dc1_prg1 {
+	status = "okay";
+};
+
+&dc1_prg2 {
+	status = "okay";
+};
+
+&dc1_prg3 {
+	status = "okay";
+};
+
+&dc1_prg4 {
+	status = "okay";
+};
+
+&dc1_prg5 {
+	status = "okay";
+};
+
+&dc1_prg6 {
+	status = "okay";
+};
+
+&dc1_prg7 {
+	status = "okay";
+};
+
+&dc1_prg8 {
+	status = "okay";
+};
+
+&dc1_prg9 {
+	status = "okay";
+};
+
+&dpu1 {
+	status = "okay";
+};
+
+&dpu2 {
+	status = "okay";
+};
 
 /* Apalis ETH1 */
 &fec1 {
@@ -51,6 +183,14 @@
 
 /* Apalis I2C3 (CAM) */
 &i2c3 {
+	status = "okay";
+};
+
+&irqsteer_csi0 {
+	status = "okay";
+};
+
+&irqsteer_csi1 {
 	status = "okay";
 };
 
@@ -104,9 +244,17 @@
 	status = "okay";
 };
 
-/* TODO: Apalis PCIE1 */
+/* Apalis PCIE1 */
+&pciea{
+	status = "okay";
+};
 
-/* TODO: Apalis BKL1_PWM */
+/* Apalis BKL1_PWM */
+&pwm_lvds1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_pwm_bkl>;
+	status = "okay";
+};
 
 /* Apalis DAP1 */
 &sai1 {
@@ -121,14 +269,29 @@
 	status = "okay";
 };
 
-/* TODO: Apalis SATA1 */
+/* Apalis SATA1 */
+&sata {
+	status = "okay";
+};
 
 /* Apalis SPDIF1 */
 &spdif0 {
 	status = "okay";
 };
 
-/* TODO: Apalis USBH2, Apalis USBH3 and on-module Wi-Fi via on-module HSIC Hub */
+&spdif1 {
+	status = "okay";
+};
+
+&spdif1_lpcg {
+	status = "okay";
+};
+
+/* Apalis USBH2, Apalis USBH3 and on-module Wi-Fi via on-module HSIC Hub */
+&usbh1 {
+	vbus-supply = <&reg_usb_host_vbus>;
+	status = "okay";
+};
 
 /* Apalis USBO1 */
 &usbotg1 {
