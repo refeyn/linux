@@ -257,7 +257,9 @@ static enum drm_mode_status lcdif_crtc_mode_valid(struct drm_crtc *crtc,
 check_pix_clk:
 	rate = lcdif_pix_clk_round_rate(lcdif, mode->clock * 1000);
 
-	if (rate <= 0 || rate != mode->clock * 1000)
+	/* allow +/-10% pixel clock rate shift */
+	if (rate < mode->clock * 900 ||
+	    rate > mode->clock * 1100)
 		return MODE_BAD;
 
 	return MODE_OK;
