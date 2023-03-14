@@ -246,6 +246,33 @@
 	status = "okay";
 };
 
+&irqsteer_csi0 {
+	status = "okay";
+};
+
+&isi_0 {
+	/**
+	 * interface = <Input MIPI_VCx Output>
+	 * Input:	0-DC0, 1-DC1, 2-MIPI CSI0, 3-MIPI CSI1, 4-HDMI, 5-MEM, INPUT: 6-PARALLEL CSI
+	 * MIPI_VCx:	0-VC0, 1-VC1, 2-VC2, 3-VC3, MIPI CSI only
+	 * Output:	0-DC0, 1-DC1, 2-MEM
+	 */
+	interface = <2 0 2>;
+
+	cap_device {
+		status = "okay";
+	};
+
+	m2m_device {
+		status = "okay";
+	};
+};
+
+&isi_1 {
+	interface = <6 0 2>;
+	parallel_csi;
+};
+
 &jpegdec {
 	status = "okay";
 };
@@ -484,7 +511,11 @@
 	status="okay";
 };
 
-/* TODO MIPI CSI */
+/* MIPI CSI accessible via FFC (X3) */
+&mipi_csi_0 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+};
 
 /* TODO MIPI DSI with DSI-to-HDMI bridge lt8912 */
 
