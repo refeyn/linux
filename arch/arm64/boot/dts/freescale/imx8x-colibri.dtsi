@@ -147,6 +147,10 @@
 			     "enet0_lpcg_ipg_s_clk";
 };
 
+&gpu_3d0 {
+	status = "okay";
+};
+
 /* On-module I2C */
 &i2c0 {
 	#address-cells = <1>;
@@ -236,6 +240,10 @@
 	clock-frequency = <100000>;
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_i2c1>;
+};
+
+&imx8_gpu_ss {
+	status = "okay";
 };
 
 &jpegdec {
