@@ -260,9 +260,23 @@
 	};
 };
 
-/* TODO i2c lvds0 accessible on FFC (X2) */
+/* MIPI DSI I2C accessible on FFC (X2) */
+&i2c0_mipi_lvds0 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	clock-frequency = <100000>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_i2c0_mipi_lvds0>;
+};
 
-/* TODO i2c lvds1 accessible on FFC (X3) */
+/* MIPI CSI I2C accessible on FFC (X3) */
+&i2c0_mipi_lvds1 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	clock-frequency = <100000>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_i2c0_mipi_lvds1>;
+};
 
 /* Colibri I2C */
 &i2c1 {
@@ -547,8 +561,6 @@
 	#address-cells = <1>;
 	#size-cells = <0>;
 };
-
-/* TODO MIPI DSI with DSI-to-HDMI bridge lt8912 */
 
 &hsio_refb_clk {
 	enable-gpios = <&gpio_expander_43 3 GPIO_ACTIVE_HIGH>;
