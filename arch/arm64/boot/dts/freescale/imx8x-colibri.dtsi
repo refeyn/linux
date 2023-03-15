@@ -37,6 +37,25 @@
 		};
 	};
 
+	/* Colibri Parallel RGB */
+	display_lcdif: display@disp1 {
+		compatible = "fsl,imx-lcdif-mux-display";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_lcdif>;
+		clocks = <&clk IMX_SC_R_LCD_0 IMX_SC_PM_CLK_BYPASS>,
+			 <&clk IMX_SC_R_LCD_0 IMX_SC_PM_CLK_MISC0>;
+		clock-names = "bypass_div", "pixel";
+		assigned-clocks = <&clk IMX_SC_R_LCD_0 IMX_SC_PM_CLK_MISC0>;
+		assigned-clock-parents = <&clk IMX_SC_R_LCD_0 IMX_SC_PM_CLK_BYPASS>;
+		fsl,lcdif-mux-regs = <&lcdif_mux_regs>;
+		fsl,interface-pix-fmt = "rgb666";
+		power-domains = <&pd IMX_SC_R_LCD_0>;
+		status = "disabled";
+
+		#address-cells = <1>;
+		#size-cells = <0>;
+	};
+
 	extcon_usbc_det: usbc-det {
 		compatible = "linux,extcon-usb-gpio";
 		pinctrl-names = "default";
@@ -144,6 +163,12 @@
 	vref-supply = <&reg_module_vref_1v8>;
 };
 
+&adma_lcdif {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_lcdif>;
+	status = "disabled";
+};
+
 /* Colibri PWM_A */
 &adma_pwm {
 	pinctrl-names = "default";
@@ -161,6 +186,74 @@
 	hysteresis = <2000>;
 	temperature = <105000>;
 	type = "critical";
+};
+
+&dc0_dpr1_channel1 {
+	status = "okay";
+};
+
+&dc0_dpr1_channel2 {
+	status = "okay";
+};
+
+&dc0_dpr1_channel3 {
+	status = "okay";
+};
+
+&dc0_dpr2_channel1 {
+	status = "okay";
+};
+
+&dc0_dpr2_channel2 {
+	status = "okay";
+};
+
+&dc0_dpr2_channel3 {
+	status = "okay";
+};
+
+&dc0_pc {
+	status = "okay";
+};
+
+&dc0_prg1 {
+	status = "okay";
+};
+
+&dc0_prg2 {
+	status = "okay";
+};
+
+&dc0_prg3 {
+	status = "okay";
+};
+
+&dc0_prg4 {
+	status = "okay";
+};
+
+&dc0_prg5 {
+	status = "okay";
+};
+
+&dc0_prg6 {
+	status = "okay";
+};
+
+&dc0_prg7 {
+	status = "okay";
+};
+
+&dc0_prg8 {
+	status = "okay";
+};
+
+&dc0_prg9 {
+	status = "okay";
+};
+
+&dpu1 {
+	status = "okay";
 };
 
 &enet0_lpcg {
@@ -325,8 +418,6 @@
 &jpegenc {
 	status = "okay";
 };
-
-/* TODO Parallel RRB */
 
 /* Colibri UART_B */
 &lpuart0 {
