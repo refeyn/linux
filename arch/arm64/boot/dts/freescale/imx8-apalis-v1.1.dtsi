@@ -655,15 +655,6 @@
 	 */
 	pad-wakeup = <IMX8QM_SPI3_CS0 5 20>;
 	pad-wakeup-num = <1>;
-
-	pcie-wifi-hog {
-		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_pcie_wifi_refclk>;
-		gpio-hog;
-		gpios = <11 GPIO_ACTIVE_HIGH>;
-		line-name = "PCIE_WIFI_CLK";
-		output-high;
-	};
 };
 
 &lsio_gpio3 {
@@ -729,16 +720,6 @@
 			  "MXM3_291",
 			  "MXM3_289",
 			  "MXM3_287";
-
-	/* Enable pcie root / sata ref clock unconditionally */
-	pcie-sata-hog {
-		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_pcie_sata_refclk>;
-		gpio-hog;
-		gpios = <11 GPIO_ACTIVE_HIGH>;
-		line-name = "PCIE_SATA_CLK";
-		output-high;
-	};
 };
 
 &lsio_gpio5 {

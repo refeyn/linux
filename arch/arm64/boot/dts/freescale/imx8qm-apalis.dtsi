@@ -194,12 +194,6 @@
 			  "MXM3_291",
 			  "MXM3_289",
 			  "MXM3_287";
-
-	/* Enable pcie root / sata ref clock unconditionally */
-	pcie-sata-hog {
-		gpios = <27 GPIO_ACTIVE_HIGH>;
-	};
-
 };
 
 &lsio_gpio5 {
