@@ -101,6 +101,13 @@
 			reg = <0 0x94400000 0 0x700000>;
 			no-map;
 		};
+
+		linux,cma {
+			compatible = "shared-dma-pool";
+			linux,cma-default;
+			reusable;
+			size = <0 0x1A000000>;
+		};
 	};
 
 	sound-card {
