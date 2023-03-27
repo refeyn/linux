@@ -30,6 +30,10 @@
 	ddc-i2c-bus = <&i2c0>;
 };
 
+&hsio_refa_clk {
+	enable-gpios = <&lsio_gpio4 27 GPIO_ACTIVE_HIGH>;
+};
+
 /* Apalis I2C2 (DDC) */
 &i2c0 {
 	pinctrl-names = "default";

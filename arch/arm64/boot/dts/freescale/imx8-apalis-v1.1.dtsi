@@ -365,11 +365,17 @@
 };
 
 &hsio_refa_clk {
-	status = "disabled";
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_pcie_sata_refclk>;
+	enable-gpios = <&lsio_gpio4 11 GPIO_ACTIVE_HIGH>;
 };
 
 &hsio_refb_clk {
-	status = "disabled";
+	/* We have to enable the PCIe clock when we enable the Wifi reference clock */
+	clocks = <&hsio_refa_clk>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_pcie_wifi_refclk>;
+	enable-gpios = <&lsio_gpio2 11 GPIO_ACTIVE_HIGH>;
 };
 
 &gpu_alert0 {
