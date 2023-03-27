@@ -833,7 +833,7 @@
 	clock-names = "pcie", "pcie_bus", "pcie_inbound_axi",
 		      "pcie_phy", "pcie_phy_pclk", "phy_per",
 		      "pcie_per", "pciex2_per", "misc_per";
-	epdev_on-supply = <&reg_module_wifi>;
+	vpcie-supply = <&reg_module_wifi>;
 	ext_osc = <1>;
 	fsl,max-link-speed = <1>;
 	pinctrl-names = "default";
