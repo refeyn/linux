@@ -802,15 +802,6 @@
 
 /* Apalis PCIE1 */
 &pciea {
-	clocks = <&pciea_lpcg 0>,
-		 <&pciea_lpcg 1>,
-		 <&pciea_lpcg 2>,
-		 <&phyx2_lpcg 0>,
-		 <&phyx2_crr0_lpcg 0>,
-		 <&pciea_crr2_lpcg 0>,
-		 <&misc_crr5_lpcg 0>;
-	clock-names = "pcie", "pcie_bus", "pcie_inbound_axi",
-		      "pcie_phy", "phy_per", "pcie_per", "misc_per";
 	ext_osc = <1>;
 	fsl,max-link-speed = <1>;
 	pinctrl-names = "default";
@@ -821,18 +812,6 @@
 
 /* On-module Wi-Fi */
 &pcieb {
-	clocks = <&pcieb_lpcg 0>,
-		 <&pcieb_lpcg 1>,
-		 <&pcieb_lpcg 2>,
-		 <&phyx2_lpcg 1>,
-		 <&phyx2_lpcg 0>,
-		 <&phyx2_crr0_lpcg 0>,
-		 <&pcieb_crr3_lpcg 0>,
-		 <&pciea_crr2_lpcg 0>,
-		 <&misc_crr5_lpcg 0>;
-	clock-names = "pcie", "pcie_bus", "pcie_inbound_axi",
-		      "pcie_phy", "pcie_phy_pclk", "phy_per",
-		      "pcie_per", "pciex2_per", "misc_per";
 	vpcie-supply = <&reg_module_wifi>;
 	ext_osc = <1>;
 	fsl,max-link-speed = <1>;
@@ -868,23 +847,6 @@
 
 /* Apalis SATA1 */
 &sata {
-	clocks = <&sata_lpcg 0>,
-		 <&phyx1_lpcg 0>,
-		 <&phyx1_lpcg 1>,
-		 <&phyx1_lpcg 2>,
-		 <&phyx2_crr0_lpcg 0>,
-		 <&phyx1_crr1_lpcg 0>,
-		 <&pciea_crr2_lpcg 0>,
-		 <&pcieb_crr3_lpcg 0>,
-		 <&sata_crr4_lpcg 0>,
-		 <&misc_crr5_lpcg 0>,
-		 <&phyx2_lpcg 0>,
-		 <&phyx2_lpcg 1>,
-		 <&phyx1_lpcg 3>;
-	clock-names = "sata", "sata_ref", "epcs_tx", "epcs_rx",
-		      "per_clk0", "per_clk1", "per_clk2",
-		      "per_clk3", "per_clk4", "per_clk5",
-		      "phy_pclk0", "phy_pclk1", "phy_apbclk";
 	ext_osc = <1>;
 };
 
