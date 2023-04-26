@@ -119,6 +119,18 @@
 			sound-dai = <&sai0>;
 		};
 	};
+
+	reg_module_wifi: regulator-module-wifi {
+		compatible = "regulator-fixed";
+		enable-active-high;
+		gpio = <&gpio_expander_43 6 GPIO_ACTIVE_HIGH>;
+		regulator-name = "Wi-Fi_PDn";
+		startup-delay-us = <100>;
+
+		regulator-state-mem {
+			regulator-off-in-suspend;
+		};
+	};
 };
 
 /* Colibri Analogue Inputs */
@@ -241,18 +253,6 @@
 				  "USB_BYPASS_N",
 				  "Wi-Fi_PDn",
 				  "Wi-Fi_WKUP_BT";
-
-		pcie-clk-on-hog {
-			gpio-hog;
-			gpios = <3 GPIO_ACTIVE_HIGH>;
-			output-high;
-		};
-
-		wifi-power-on-hog {
-			gpio-hog;
-			gpios = <6 GPIO_ACTIVE_HIGH>;
-			output-high;
-		};
 	};
 };
 
@@ -546,6 +546,10 @@
 
 /* TODO MIPI DSI with DSI-to-HDMI bridge lt8912 */
 
+&hsio_refb_clk {
+	enable-gpios = <&gpio_expander_43 3 GPIO_ACTIVE_HIGH>;
+};
+
 /* On-module PCIe for Wi-Fi */
 &pcieb {
 	compatible = "fsl,imx8qxp-pcie", "snps,dw-pcie";
@@ -554,6 +558,7 @@
 	ext_osc = <1>;
 	fsl,max-link-speed = <1>;
 	reset-gpio = <&lsio_gpio4 0 GPIO_ACTIVE_LOW>;
+	vpcie-supply = <&reg_module_wifi>;
 	status = "okay";
 };
 
