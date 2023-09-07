@@ -1960,7 +1960,6 @@
 				#dma-cells = <3>;
 				fsl,sdma-ram-script-name = "imx/sdma/sdma-imx7d.bin";
 				power-domains = <&audiomix_pd>;
-				status = "disabled";
 			};
 
 			sdma2: dma-controller@30e10000 {
@@ -1973,7 +1972,6 @@
 				#dma-cells = <3>;
 				fsl,sdma-ram-script-name = "imx/sdma/sdma-imx7d.bin";
 				power-domains = <&audiomix_pd>;
-				status = "disabled";
 			};
 
 			audio_blk_ctrl: audio-blk-ctrl@30e20000 {
