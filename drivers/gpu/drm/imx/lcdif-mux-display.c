@@ -51,20 +51,6 @@ static inline struct imx_lcdif_mux_display *enc_to_lmuxd(struct drm_encoder *e)
 	return container_of(e, struct imx_lcdif_mux_display, encoder);
 }
 
-static void imx_lmuxd_encoder_enable(struct drm_encoder *encoder)
-{
-	struct imx_lcdif_mux_display *lmuxd = enc_to_lmuxd(encoder);
-
-	clk_prepare_enable(lmuxd->clk_pixel);
-}
-
-static void imx_lmuxd_encoder_disable(struct drm_encoder *encoder)
-{
-	struct imx_lcdif_mux_display *lmuxd = enc_to_lmuxd(encoder);
-
-	clk_disable_unprepare(lmuxd->clk_pixel);
-}
-
 static void
 imx_lmuxd_encoder_atomic_mode_set(struct drm_encoder *encoder,
 				  struct drm_crtc_state *crtc_state,
@@ -119,8 +105,6 @@ imx_lmuxd_encoder_atomic_check(struct drm_encoder *encoder,
 }
 
 static const struct drm_encoder_helper_funcs imx_lmuxd_encoder_helper_funcs = {
-	.enable = imx_lmuxd_encoder_enable,
-	.disable = imx_lmuxd_encoder_disable,
 	.atomic_mode_set = imx_lmuxd_encoder_atomic_mode_set,
 	.atomic_check = imx_lmuxd_encoder_atomic_check,
 };
@@ -197,14 +181,33 @@ static int imx_lmuxd_bind(struct device *dev, struct device *master, void *data)
 		}
 	}
 
+	/**
+	 * We need to make sure the clock is enabled the whole time we use this
+	 * driver. Else it might happen that something in the display pipeline
+	 * runs out of sync and we see some ghosting effects. It is not clear
+	 * what exactly triggers this issue and could maybe also be solved in
+	 * the driver that causes the issue by adding a dependency to the pixel
+	 * clock.
+	 */
+	ret = clk_prepare_enable(lmuxd->clk_pixel);
+	if (ret)
+		return ret;
+
 	lmuxd->dev = dev;
 
-	return imx_lmuxd_register(drm, lmuxd);
+	ret = imx_lmuxd_register(drm, lmuxd);
+	if (ret)
+		clk_disable_unprepare(lmuxd->clk_pixel);
+
+	return ret;
 }
 
 static void imx_lmuxd_unbind(struct device *dev, struct device *master,
 	void *data)
 {
+	struct imx_lcdif_mux_display *lmuxd = dev_get_drvdata(dev);
+
+	clk_disable_unprepare(lmuxd->clk_pixel);
 }
 
 static const struct component_ops imx_lmuxd_ops = {
