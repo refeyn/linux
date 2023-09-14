@@ -995,6 +995,26 @@ static int mipi_csi2_s_power(struct v4l2_subdev *sd, int on)
 	return v4l2_subdev_call(sen_sd, core, s_power, on);
 }
 
+static long mipi_csi2_s_ioctl(struct v4l2_subdev *sd, unsigned int cmd, void *arg)
+{
+	struct mxc_mipi_csi2_dev *csi2dev = sd_to_mxc_mipi_csi2_dev(sd);
+	struct v4l2_subdev *sen_sd;
+	int ret = -ENOIOCTLCMD;
+
+	switch (cmd) {
+	case V4L2_CID_TEST_PATTERN:
+		sen_sd = mxc_get_remote_subdev(csi2dev, __func__);
+		if (!sen_sd)
+			return -EINVAL;
+		ret = v4l2_subdev_call(sen_sd, core, ioctl, V4L2_CID_TEST_PATTERN, arg);
+		break;
+	default:
+		break;
+	}
+
+	return ret;
+}
+
 static int mipi_csi2_g_frame_interval(struct v4l2_subdev *sd,
 				struct v4l2_subdev_frame_interval *interval)
 {
@@ -1141,6 +1161,7 @@ static struct v4l2_subdev_pad_ops mipi_csi2_pad_ops = {
 
 static struct v4l2_subdev_core_ops mipi_csi2_core_ops = {
 	.s_power = mipi_csi2_s_power,
+	.ioctl = mipi_csi2_s_ioctl,
 };
 
 static struct v4l2_subdev_video_ops mipi_csi2_video_ops = {

@@ -57,6 +57,9 @@ struct mxc_isi_fmt mxc_isi_src_formats[] = {
 	}
 };
 
+static struct v4l2_subdev *mxc_get_remote_subdev(struct v4l2_subdev *subdev,
+						 const char * const label);
+
 struct mxc_isi_fmt *mxc_isi_get_format(unsigned int index)
 {
 	return &mxc_isi_out_formats[index];
@@ -504,10 +507,19 @@ static inline struct mxc_isi_cap_dev *ctrl_to_isi_cap(struct v4l2_ctrl *ctrl)
 	return container_of(ctrl->handler, struct mxc_isi_cap_dev, ctrls.handler);
 }
 
+static const char * const test_pattern_menu[] = {
+	"Disabled",
+	"Color bars",
+	"Color bars w/ rolling bar",
+	"Color squares",
+	"Color squares w/ rolling bar",
+};
+
 static int mxc_isi_s_ctrl(struct v4l2_ctrl *ctrl)
 {
 	struct mxc_isi_cap_dev *isi_cap = ctrl_to_isi_cap(ctrl);
 	struct mxc_isi_dev *mxc_isi = mxc_isi_get_hostdata(isi_cap->pdev);
+	struct v4l2_subdev *sd;
 	unsigned long flags;
 
 	dev_dbg(&isi_cap->pdev->dev, "%s\n", __func__);
@@ -535,6 +547,16 @@ static int mxc_isi_s_ctrl(struct v4l2_ctrl *ctrl)
 			return -EINVAL;
 		mxc_isi->alpha = ctrl->val;
 		mxc_isi->alphaen = 1;
+		break;
+
+	case V4L2_CID_TEST_PATTERN:
+		if (ctrl->val < 0)
+			return -EINVAL;
+		mxc_isi->test_pattern = ctrl->val;
+		sd = mxc_get_remote_subdev(&isi_cap->sd, __func__);
+		if (!sd)
+			return -ENODEV;
+		v4l2_subdev_call(sd, core, ioctl, V4L2_CID_TEST_PATTERN, &mxc_isi->test_pattern);
 		break;
 
 	default:
@@ -568,6 +590,10 @@ int mxc_isi_ctrls_create(struct mxc_isi_cap_dev *isi_cap)
 	ctrls->alpha = v4l2_ctrl_new_std(handler, &mxc_isi_ctrl_ops,
 					 V4L2_CID_ALPHA_COMPONENT,
 					 0, 0xff, 1, 0);
+	ctrls->test_pattern =
+		v4l2_ctrl_new_std_menu_items(handler, &mxc_isi_ctrl_ops, V4L2_CID_TEST_PATTERN,
+					     ARRAY_SIZE(test_pattern_menu) - 1,
+					     0, 0, test_pattern_menu);
 
 	if (!handler->error)
 		ctrls->ready = true;

@@ -3764,11 +3764,28 @@ static int ov5640_init_cfg(struct v4l2_subdev *sd,
 	return 0;
 }
 
+static long ov5640_s_ioctl(struct v4l2_subdev *sd, unsigned int cmd, void *arg)
+{
+	struct ov5640_dev *sensor = to_ov5640_dev(sd);
+	int ret = -ENOIOCTLCMD;
+
+	switch (cmd) {
+	case V4L2_CID_TEST_PATTERN:
+		ret = v4l2_ctrl_s_ctrl(sensor->ctrls.test_pattern, *(s32 *)arg);
+		break;
+	default:
+		break;
+	}
+
+	return ret;
+}
+
 static const struct v4l2_subdev_core_ops ov5640_core_ops = {
 	.s_power = ov5640_s_power,
 	.log_status = v4l2_ctrl_subdev_log_status,
 	.subscribe_event = v4l2_ctrl_subdev_subscribe_event,
 	.unsubscribe_event = v4l2_event_subdev_unsubscribe,
+	.ioctl = ov5640_s_ioctl,
 };
 
 static const struct v4l2_subdev_video_ops ov5640_video_ops = {
