@@ -140,6 +140,7 @@ struct mxc_isi_ctrls {
 	struct v4l2_ctrl *hflip;
 	struct v4l2_ctrl *vflip;
 	struct v4l2_ctrl *alpha;
+	struct v4l2_ctrl *test_pattern;
 	struct v4l2_ctrl *num_cap_buf;
 	struct v4l2_ctrl *num_out_buf;
 	bool ready;
@@ -376,6 +377,7 @@ struct mxc_isi_dev {
 
 	u8 chain_buf;
 	u8 alpha;
+	int test_pattern;
 	bool m2m_enabled;
 	bool cap_enabled;
 	bool buf_active_reverse;
