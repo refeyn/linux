@@ -449,6 +449,21 @@ static int nwl_dsi_config_dpi(struct nwl_dsi *dsi)
 	if (dsi->dsi_mode_flags & MIPI_DSI_MODE_VIDEO_NO_HSA)
 		hsa = hsync_len;
 
+	if (of_device_is_compatible(dsi->panel_bridge->of_node,
+					   "lontium,lt8912b")) {
+		int bytes = mipi_dsi_pixel_format_to_bpp(dsi->format) >> 3;
+
+		/*
+		 * Most likely we have the same issue with the LT8912B as
+		 * described above. However, magic timings are a bit different
+		 * compared to the displays.
+		 */
+		hfp = hfront_porch;
+		hbp = bytes * hback_porch;
+		hsa = bytes * hsync_len;
+		hsa = roundup(hsa, 2);
+	}
+
 	DRM_DEV_DEBUG_DRIVER(dsi->dev, "Actual hfp: %d\n", hfp);
 	DRM_DEV_DEBUG_DRIVER(dsi->dev, "Actual hbp: %d\n", hbp);
 	DRM_DEV_DEBUG_DRIVER(dsi->dev, "Actual hsa: %d\n", hsa);
