@@ -18,6 +18,11 @@
 		stdout-path = &lpuart0;
 	};
 
+
+	aliases {
+		/delete-property/ ethernet1;
+	};
+
 	memory@80000000 {
 		device_type = "memory";
 		reg = <0x00000000 0x80000000 0 0x40000000>;
@@ -683,26 +688,7 @@
 	clock-frequency = <100000>;
 	status = "okay";
 
-	adv_bridge0: adv7535@3d {
-		#address-cells = <1>;
-		#size-cells = <0>;
-
-		compatible = "adi,adv7535";
-		reg = <0x3d>;
-		adi,addr-cec = <0x3b>;
-		adi,dsi-lanes = <4>;
-		adi,dsi-channel = <1>;
-		interrupt-parent = <&lsio_gpio1>;
-		interrupts = <19 IRQ_TYPE_LEVEL_LOW>;
-		status = "okay";
-
-		port@0 {
-			reg = <0>;
-			adv7535_0_in: endpoint {
-				remote-endpoint = <&mipi0_adv_out>;
-			};
-		};
-	};
+	/// TODO
 };
 
 &mipi0_dphy {
@@ -711,12 +697,83 @@
 
 &mipi0_dsi_host {
 	status = "okay";
+	fsl,clock-drop-level = <2>;
+
+	// panel@0 {
+	// 	#address-cells = <1>;
+	// 	#size-cells = <0>;
+ //
+	// 	compatible = "raydium,rm67191";
+	// 	reg = <0>;
+	// 	pinctrl-0 = <&pinctrl_mipi_dsi_0_1_en>;
+	// 	pinctrl-names = "default";
+	// 	reset-gpios = <&lsio_gpio1 7 GPIO_ACTIVE_LOW>;
+	// 	dsi-lanes = <4>;
+	// 	video-mode = <2>;
+	// 	width-mm = <68>;
+	// 	height-mm = <121>;
+ //
+	// 	port@0 {
+	// 		reg = <0>;
+	// 		panel0_in: endpoint {
+	// 			remote-endpoint = <&mipi0_panel_out>;
+	// 		};
+	// 	};
+	// };
+
+	panel@0 {
+		#address-cells = <1>;
+		#size-cells = <0>;
+		compatible = "boe,himax8279d10p";
+		reg = <0>;
+
+		pinctrl-0 = <&pinctrl_mipi_dsi_0_1_en>;
+		pinctrl-names = "default";
+		rotation = <90>;
+
+		// backlight = <&backlight>;
+/*
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_panel_gpios>;
+		enable-gpios = <&gpio3 23 GPIO_ACTIVE_HIGH>;	// I2S_2_BCLK (SODIMM 42)
+		pp18-gpios = <&gpio3 22 GPIO_ACTIVE_HIGH>;		// I2S_2_SYNC (SODIMM 44)
+		pp33-gpios = <&gpio3 24 GPIO_ACTIVE_HIGH>;		// I2S_2_D_OUT (SODIMM 46)*/
+
+		panel-timing {
+			// 1920x1200p60
+			clock-frequency = <150000000>;	// Panel clock/Pixel rate [Hz]
+
+			hactive = <1200>;				// Horizontal panel resolution [px]
+			hback-porch = <20>;		// Horizontal back porch timing
+			hfront-porch = <40>;		// Horizontal front porch panel timing
+			hsync-len = <10>;				// Horizontal sync length panel timing
+
+			vactive = <1920>;				// Vertical panel resolution [px]
+			vback-porch = <20>;				// Vertical back porch panel timing
+			vfront-porch = <10>;		// Vertical front porch panel timing
+			vsync-len = <10>;				// Vertical sync length panel timing
+
+			//hsync-active = <1>;				// Horizontal sync pulse (0 selects active low, 1 selects active high) 	- If omitted then it is not used by the hardware
+			//vsync-active = <1>;				// Vertical sync pulse (0 selects active low, 1 selects active high) 	- If omitted then it is not used by the hardware
+			//de-active = <1>;				// Data enable (0 selects active low, 1 selects active high) 			- If omitted then it is not used by the hardware
+			//pixelclk-active = <1>;			// Data driving on rising or falling edge
+											//	0 to drive pixel data on falling edge and sample data on rising edge
+											//	1 to drive pixel data on rising edge and sample data on falling edge
+		};
+
+		port@0 {
+			reg = <0>;
+			panel0_in: endpoint {
+				remote-endpoint = <&mipi0_panel_out>;
+			};
+		};
+	};
 
 	ports {
 		port@1 {
 			reg = <1>;
-			mipi0_adv_out: endpoint {
-				remote-endpoint = <&adv7535_0_in>;
+			mipi0_panel_out: endpoint {
+				remote-endpoint = <&panel0_in>;
 			};
 		};
 	};
@@ -729,7 +786,7 @@
         pinctrl-0 = <&pinctrl_mipi1_lpi2c0>;
 	clock-frequency = <100000>;
 	status = "okay";
-
+/*
 	adv_bridge1: adv7535@3d {
 		#address-cells = <1>;
 		#size-cells = <0>;
@@ -749,25 +806,25 @@
 				remote-endpoint = <&mipi1_adv_out>;
 			};
 		};
-	};
+	};*/
 };
 
-&mipi1_dphy {
-	status = "okay";
-};
-
-&mipi1_dsi_host {
-	status = "okay";
-
-	ports {
-		port@1 {
-			reg = <1>;
-			mipi1_adv_out: endpoint {
-				remote-endpoint = <&adv7535_1_in>;
-			};
-		};
-	};
-};
+// &mipi1_dphy {
+// 	status = "okay";
+// };
+//
+// &mipi1_dsi_host {
+// 	status = "okay";
+//
+// 	ports {
+// 		port@1 {
+// 			reg = <1>;
+// 			mipi1_adv_out: endpoint {
+// 				remote-endpoint = <&adv7535_1_in>;
+// 			};
+// 		};
+// 	};
+// };
 
 &dc1_pc {
 	status = "okay";
@@ -1470,8 +1527,8 @@
 			// Bit of a hack including all of these additional GPIOs here, but it shunts them into the right mode
 			IMX8QM_ESAI1_TX2_RX3_LSIO_GPIO2_IO10			0x06000040
 			IMX8QM_ESAI1_TX3_RX2_LSIO_GPIO2_IO11			0x06000040
-			IMX8QM_ENET1_RGMII_TXC_LSIO_GPIO6_IO10			0x06000040
-			IMX8QM_ENET1_RGMII_TX_CTL_LSIO_GPIO6_IO11		0x06000040
+			IMX8QM_ENET1_RGMII_TXC_LSIO_GPIO6_IO10			0xC6000060
+			IMX8QM_ENET1_RGMII_TX_CTL_LSIO_GPIO6_IO11		0xC6000020
 			IMX8QM_ENET1_RGMII_TXD0_LSIO_GPIO6_IO12			0x06000040
 			IMX8QM_ENET1_RGMII_TXD1_LSIO_GPIO6_IO13			0x06000040
 			IMX8QM_ENET1_RGMII_RX_CTL_LSIO_GPIO6_IO17		0x06000040
@@ -1816,6 +1873,11 @@
 		>;
 	};
 
+	pinctrl_mipi_dsi_0_1_en: mipi_dsi_0_1_en {
+		fsl,pins = <
+			IMX8QM_LVDS0_I2C0_SDA_LSIO_GPIO1_IO07             0x00000021
+		>;
+	};
 };
 
 &thermal_zones {
@@ -1898,3 +1960,5 @@
 	memory-region = <&encoder2_boot>, <&encoder2_rpc>;
 	status = "okay";
 };
+
+/delete-node/ &fec2;
