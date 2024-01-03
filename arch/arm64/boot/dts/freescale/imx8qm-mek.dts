@@ -683,12 +683,22 @@
 &i2c0_mipi0 {
 	#address-cells = <1>;
 	#size-cells = <0>;
-        pinctrl-names = "default";
-        pinctrl-0 = <&pinctrl_mipi0_lpi2c0>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_mipi0_lpi2c0>;
 	clock-frequency = <100000>;
 	status = "okay";
 
-	/// TODO
+	touchscreen@41 {
+		#address-cells = <1>;
+		#size-cells = <0>;
+		compatible = "ilitek,ili251x";
+		reg = <0x41>;
+
+		interrupt-parent = <&lsio_gpio1>;
+		interrupts = <19 IRQ_TYPE_LEVEL_LOW>;
+		// reset-gpios = <&gpio1 8 GPIO_ACTIVE_LOW>;
+		wakeup-source;
+	};
 };
 
 &mipi0_dphy {
