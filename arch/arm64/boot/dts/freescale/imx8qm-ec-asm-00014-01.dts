@@ -397,7 +397,7 @@
 		pwms = <&lsio_pwm0 0 100000 0>;
 		interrupt-parent = <&lsio_gpio1>;
 		interrupts = <0 IRQ_TYPE_EDGE_FALLING>;
-		pulses-per-revolution = <1>; // TODO update
+		pulses-per-revolution = <2>;
 		cooling-levels = <0 50 100 150 200 255>;
 		#cooling-cells = <2>;
 	};
@@ -409,7 +409,7 @@
 		pwms = <&lsio_pwm1 0 100000 0>;
 		interrupt-parent = <&lsio_gpio1>;
 		interrupts = <1 IRQ_TYPE_EDGE_FALLING>;
-		pulses-per-revolution = <1>; // TODO update
+		pulses-per-revolution = <2>;
 		cooling-levels = <0 50 100 150 200 255>;
 		#cooling-cells = <2>;
 	};
@@ -421,7 +421,7 @@
 		pwms = <&lsio_pwm2 0 100000 0>;
 		interrupt-parent = <&lsio_gpio1>;
 		interrupts = <2 IRQ_TYPE_EDGE_FALLING>;
-		pulses-per-revolution = <1>; // TODO update
+		pulses-per-revolution = <2>;
 		cooling-levels = <0 50 100 150 200 255>;
 		#cooling-cells = <2>;
 	};
