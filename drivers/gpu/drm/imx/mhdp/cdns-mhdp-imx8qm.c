@@ -629,6 +629,12 @@ static int cdns_mhdp_firmware_load(struct imx_mhdp_device *imx_mhdp)
 	if (!imx_mhdp->firmware_name)
 		goto out;
 
+	/* test if ucpu is already running and if so skip fw loading */
+	if (!cdns_mhdp_bus_read(&imx_mhdp->mhdp, APB_CTRL)) {
+		DRM_INFO("HDMI uCPU already running, skipping FW load.\n");
+		goto out;
+	}
+
 	if (!imx_mhdp->fw) {
 		ret = request_firmware_nowait(THIS_MODULE, FW_ACTION_NOUEVENT,
 						imx_mhdp->firmware_name,
