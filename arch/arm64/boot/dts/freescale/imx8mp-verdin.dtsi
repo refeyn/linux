@@ -144,7 +144,7 @@
 
 		linux,cma {
 			size = <0 0x20000000>;
-			/delete-node/ alloc-ranges;
+			/delete-property/ alloc-ranges;
 		};
 	};
 };
