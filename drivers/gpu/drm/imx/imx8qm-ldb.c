@@ -15,6 +15,7 @@
 
 #include <drm/bridge/fsl_imx_ldb.h>
 #include <drm/drm_atomic_helper.h>
+#include <drm/drm_of.h>
 #include <drm/drm_probe_helper.h>
 #include <drm/drm_simple_kms_helper.h>
 
@@ -504,6 +505,28 @@ static int imx8qm_ldb_probe(struct platform_device *pdev)
 {
 	struct device *dev = &pdev->dev;
 	struct imx8qm_ldb *imx8qm_ldb;
+	struct device_node *np = dev->of_node;
+	struct device_node *child;
+	int ret;
+
+	/*
+	 * Make sure we can defer already in the probe function else we will
+	 * have an issue in the bind function. It is expected that in the bind
+	 * function the driver is functional.
+	 */
+	for_each_child_of_node(np, child) {
+		struct drm_panel *panel;
+		struct drm_bridge *next_bridge;
+
+		ret = drm_of_find_panel_or_bridge(child, 1, 0,
+						  &panel, &next_bridge);
+		if (ret == -EPROBE_DEFER)
+			return ret;
+		/*
+		 * We can continue even if there is an error, this is most
+		 * likely because this driver has not loaded yet
+		 */
+	}
 
 	imx8qm_ldb = devm_kzalloc(dev, sizeof(*imx8qm_ldb), GFP_KERNEL);
 	if (!imx8qm_ldb)
