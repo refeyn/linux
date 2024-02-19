@@ -2035,6 +2035,7 @@
 				assigned-clock-rates = <500000000>, <133000000>;
 				interrupts = <8 IRQ_TYPE_LEVEL_HIGH>;
 				interrupt-parent = <&irqsteer_hdmi>;
+				fsl,gpr = <&hdmi_blk_ctrl>;
 				status = "disabled";
 
 				lcdif3_disp: port {

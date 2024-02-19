@@ -667,7 +667,8 @@ static int imx_lcdifv3_probe(struct platform_device *pdev)
 	if (IS_ERR(lcdifv3->base))
 		return PTR_ERR(lcdifv3->base);
 
-	if (of_device_is_compatible(np, "fsl,imx93-lcdif")) {
+	if (of_device_is_compatible(np, "fsl,imx93-lcdif") ||
+	    of_device_is_compatible(np, "fsl,imx8mp-lcdif3")) {
 		lcdifv3->gpr = syscon_regmap_lookup_by_phandle(np, "fsl,gpr");
 		if (IS_ERR(lcdifv3->gpr)) {
 			ret = PTR_ERR(lcdifv3->gpr);
@@ -702,6 +703,7 @@ static int imx_lcdifv3_remove(struct platform_device *pdev)
 static int imx_lcdifv3_runtime_suspend(struct device *dev)
 {
 	struct lcdifv3_soc *lcdifv3 = dev_get_drvdata(dev);
+	int val;
 
 	if (atomic_inc_return(&lcdifv3->rpm_suspended) > 1)
 		return 0;
@@ -713,6 +715,15 @@ static int imx_lcdifv3_runtime_suspend(struct device *dev)
 	/* clear LCDIF QoS and cache */
 	if (of_device_is_compatible(dev->of_node, "fsl,imx93-lcdif"))
 		regmap_write(lcdifv3->gpr, 0xc, 0x0);
+
+	if (of_device_is_compatible(dev->of_node, "fsl,imx8mp-lcdif3")) {
+		regmap_read(lcdifv3->gpr, 0x200, &val);
+		/* Disable CEC */
+		val &= ~0x2;
+		/* Power Down HDMI PHY */
+		val |= 0x8;
+		regmap_write(lcdifv3->gpr, 0x200, val);
+	}
 
 	return 0;
 }
