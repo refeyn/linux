@@ -2393,10 +2393,15 @@ static int sdma_get_firmware(struct sdma_engine *sdma,
 		const char *fw_name)
 {
 	int ret;
+	const struct firmware *fw;
 
-	ret = request_firmware_nowait(THIS_MODULE,
-			FW_ACTION_UEVENT, fw_name, sdma->dev,
-			GFP_KERNEL, sdma, sdma_load_firmware);
+	ret = request_firmware(&fw, fw_name, sdma->dev);
+	if (ret < 0) {
+		dev_err(sdma->dev, "failed to request firmware %s\n", fw_name);
+		return ret;
+	}
+
+	sdma_load_firmware(fw, sdma);
 
 	return ret;
 }
@@ -2605,6 +2610,22 @@ static int sdma_probe(struct platform_device *pdev)
 
 	platform_set_drvdata(pdev, sdma);
 
+	/*
+	 * Because that device tree does not encode ROM script address,
+	 * the RAM script in firmware is mandatory for device tree
+	 * probe, otherwise it fails.
+	 */
+	ret = of_property_read_string(np, "fsl,sdma-ram-script-name",
+				      &fw_name);
+	if (ret)
+		dev_warn(&pdev->dev, "failed to get firmware name\n");
+	else
+		sdma->fw_name = fw_name;
+
+	ret = sdma_get_firmware(sdma, sdma->fw_name);
+	if (ret)
+		dev_warn(sdma->dev, "failed to get firmware.\n");
+
 	ret = dma_async_device_register(&sdma->dma_device);
 	if (ret) {
 		dev_err(&pdev->dev, "unable to register\n");
@@ -2641,22 +2662,6 @@ static int sdma_probe(struct platform_device *pdev)
 		}
 		of_node_put(sdma_parent_np);
 	}
-
-	/*
-	 * Because that device tree does not encode ROM script address,
-	 * the RAM script in firmware is mandatory for device tree
-	 * probe, otherwise it fails.
-	 */
-	ret = of_property_read_string(np, "fsl,sdma-ram-script-name",
-				      &fw_name);
-	if (ret)
-		dev_warn(&pdev->dev, "failed to get firmware name\n");
-	else
-		sdma->fw_name = fw_name;
-
-	ret = sdma_get_firmware(sdma, sdma->fw_name);
-	if (ret)
-		dev_warn(sdma->dev, "failed to get firmware.\n");
 
 	/* enable autosuspend for pm_runtime */
 	if (sdma->drvdata->pm_runtime) {
