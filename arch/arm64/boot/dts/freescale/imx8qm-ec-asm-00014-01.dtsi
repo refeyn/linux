@@ -7,8 +7,6 @@
  *	Matthew Joyce <matthew.joyce@refeyn.com>
  */
 
-/dts-v1/;
-
 #include <dt-bindings/usb/pd.h>
 #include <dt-bindings/leds/common.h>
 #include <dt-bindings/pwm/pwm.h>
@@ -189,17 +187,6 @@
 		regulator-always-on;
 	};
 
-	reg_usb_otg3_vbus: regulator-usbotg3-vbus {
-		compatible = "regulator-fixed";
-		regulator-name = "usb_otg3_vbus";
-		regulator-min-microvolt = <5000000>;
-		regulator-max-microvolt = <5000000>;
-		gpio = <&lsio_gpio1 9 GPIO_ACTIVE_HIGH>;
-		over-current-gpios = <&lsio_gpio1 10 GPIO_ACTIVE_HIGH>;
-		enable-active-high;
-		regulator-always-on;
-	};
-
 	reg_pmic_ldo_vselect0: regulator-pmic-ldo-vselect0 {
 		compatible = "regulator-fixed";
 		pinctrl-names = "default";
@@ -210,7 +197,6 @@
 		gpio = <&lsio_gpio4 8 GPIO_ACTIVE_LOW>;
 		regulator-always-on;
 	};
-
 
 	reg_level_shifters_enable: regulator-level-shifters-enable {
 		compatible = "regulator-fixed";
@@ -285,6 +271,7 @@
 		pwms = <&pwm_mipi0 0 2000000 0>; // 500Hz
 		brightness-levels = <0 4 8 16 32 64 128 255>;
 		default-brightness-level = <6>;
+		status = "disabled";
 	};
 
 	mipi_dsi1_backlight: mipi_backlight@1 {
@@ -292,6 +279,7 @@
 		pwms = <&pwm_mipi1 0 2000000 0>; // 500Hz
 		brightness-levels = <0 4 8 16 32 64 128 255>;
 		default-brightness-level = <6>;
+		status = "disabled";
 	};
 
 	// LEDs
@@ -477,6 +465,7 @@
 			<&clk IMX_SC_R_FSPI_1 IMX_SC_PM_CLK_PER>;
 		clock-names = "fspi", "fspi_en";
 		power-domains = <&pd IMX_SC_R_FSPI_1>;
+		status = "disabled";
 	};
 };
 
@@ -517,8 +506,6 @@
 	// Actual PWM controller
 	pwm_mipi0: pwm@56224000 {
 		compatible = "fsl,imx8qm-pwm", "fsl,imx27-pwm";
-		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_pwm_mipi_dsi0>;
 		reg = <0x56224000 0x1000>;
 		clocks = <&mipi0_pwm_lpcg_ipg_clk_highfreq 0>,
 				<&mipi0_pwm_lpcg_ipg_clk 0>;
@@ -527,70 +514,7 @@
 		assigned-clock-rates = <24000000>;
 		#pwm-cells = <2>;
 		power-domains = <&pd IMX_SC_R_MIPI_0_PWM_0>;
-	};
-};
-
-&i2c0_mipi0 {
-	#address-cells = <1>;
-	#size-cells = <0>;
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_mipi0_lpi2c0>;
-	clock-frequency = <100000>;
-	status = "disabled";
-
-	touchscreen@41 {
-		#address-cells = <1>;
-		#size-cells = <0>;
-		compatible = "ilitek,ili251x";
-		reg = <0x41>;
-
-		interrupt-parent = <&lsio_gpio1>;
-		interrupts = <19 IRQ_TYPE_LEVEL_LOW>;
-		// reset-gpios = <&gpio1 8 GPIO_ACTIVE_LOW>; TODO update reset pin
-		wakeup-source;
 		status = "disabled";
-	};
-};
-
-&mipi0_dphy {
-	status = "disabled";
-};
-
-&mipi0_dsi_host {
-	status = "disabled";
-	fsl,clock-drop-level = <2>;
-
-	panel@0 {
-		#address-cells = <1>;
-		#size-cells = <0>;
-		compatible = "densitron,dmt101f3nmcmu-1a";
-		reg = <0>;
-
-		rotation = <90>;
-
-		backlight = <&mipi_dsi0_backlight>;
-
-/*
-		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_panel_gpios>; TODO update reset pin
-		reset-gpios = <&gpio3 23 GPIO_ACTIVE_HIGH>;	// I2S_2_BCLK (SODIMM 42)*/
-		status = "disabled";
-
-		port@0 {
-			reg = <0>;
-			panel0_in: endpoint {
-				remote-endpoint = <&mipi0_panel_out>;
-			};
-		};
-	};
-
-	ports {
-		port@1 {
-			reg = <1>;
-			mipi0_panel_out: endpoint {
-				remote-endpoint = <&panel0_in>;
-			};
-		};
 	};
 };
 
@@ -631,8 +555,6 @@
 	// Actual PWM controller
 	pwm_mipi1: pwm@57224000 {
 		compatible = "fsl,imx8qm-pwm", "fsl,imx27-pwm";
-		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_pwm_mipi_dsi1>;
 		reg = <0x57224000 0x1000>;
 		clocks = <&mipi1_pwm_lpcg_ipg_clk_highfreq 0>,
 				<&mipi1_pwm_lpcg_ipg_clk 0>;
@@ -641,70 +563,7 @@
 		assigned-clock-rates = <24000000>;
 		#pwm-cells = <2>;
 		power-domains = <&pd IMX_SC_R_MIPI_1_PWM_0>;
-	};
-};
-
-&i2c0_mipi1 {
-	#address-cells = <1>;
-	#size-cells = <0>;
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_mipi1_lpi2c0>;
-	clock-frequency = <100000>;
-	status = "okay";
-
-	touchscreen@41 {
-		#address-cells = <1>;
-		#size-cells = <0>;
-		compatible = "ilitek,ili251x";
-		reg = <0x41>;
-
-		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_mipi1_touchscreen>;
-
-		interrupt-parent = <&lsio_gpio1>;
-		interrupts = <23 IRQ_TYPE_LEVEL_LOW>;
-		reset-gpios = <&lsio_gpio0 4 GPIO_ACTIVE_LOW>;	// Correct for EC-ASM-00025-01 SBC Test PCB
-		wakeup-source;
-	};
-};
-
-&mipi1_dphy {
-	status = "okay";
-};
-
-&mipi1_dsi_host {
-	status = "okay";
-	fsl,clock-drop-level = <2>;
-
-	panel@0 {
-		#address-cells = <1>;
-		#size-cells = <0>;
-		compatible = "densitron,dmt101f3nmcmu-1a";
-		reg = <0>;
-
-		rotation = <90>;
-
-		backlight = <&mipi_dsi1_backlight>;
-
-		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_mipi1_panel>;
-		reset-gpios = <&lsio_gpio0 5 GPIO_ACTIVE_HIGH>;	// Correct for EC-ASM-00025-01 SBC Test PCB
-
-		port@0 {
-			reg = <0>;
-			panel1_in: endpoint {
-				remote-endpoint = <&mipi1_panel_out>;
-			};
-		};
-	};
-
-	ports {
-		port@1 {
-			reg = <1>;
-			mipi1_panel_out: endpoint {
-				remote-endpoint = <&panel1_in>;
-			};
-		};
+		status = "disabled";
 	};
 };
 
@@ -782,33 +641,6 @@
 	status = "okay";
 };
 
-// SPI buses
-
-&lpspi0 { // Debug SPI
-	#address-cells = <1>;
-	#size-cells = <0>;
-	fsl,spi-num-chipselects = <2>;
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_lpspi0>;
-	cs-gpios = <&lsio_gpio3 5 GPIO_ACTIVE_LOW>,
-		<&lsio_gpio3 6 GPIO_ACTIVE_LOW>;
-	assigned-clock-rates = <60000000>;
-	status = "okay";
-
-	// Add spidev devices
-	spidev_debug0: spi@0 {
-		reg = <0>;
-		compatible = "rohm,dh2228fv";
-		spi-max-frequency = <30000000>;
-	};
-
-	spidev_debug1: spi@1 {
-		reg = <1>;
-		compatible = "rohm,dh2228fv";
-		spi-max-frequency = <30000000>;
-	};
-};
-
 // QSPI
 
 &flexspi0 { // On-board QSPI for the flash chip
@@ -826,15 +658,6 @@
 		spi-tx-bus-width = <4>;
 		spi-rx-bus-width = <4>;
 	};
-};
-
-&flexspi1 { // Aux board QSPI
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_flexspi1>;
-	nxp,fspi-dll-slvdly = <4>;
-	status = "okay";
-
-	// No device on EC-ASM-00025-01 SBC Test PCB
 };
 
 // I2C
@@ -886,17 +709,6 @@
 		compatible = "atmel,24c64"; // Our chip is a 24AA64, which is the same except for a lower clock speed
 		reg = <0x50>;
 	};
-};
-
-&cm40_i2c { // Aux card I2C bus
-	#address-cells = <1>;
-	#size-cells = <0>;
-	clock-frequency = <100000>;
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_cm40_i2c>;
-	status = "okay";
-
-	// On EC-ASM-00025-01 SBC Test PCB this these pins are used for UART
 };
 
 &cm41_i2c { // Debug I2C bus
@@ -1040,23 +852,6 @@
 	no-1-8-v;
 };
 
-// USB OTG
-
-&usb3_phy {
-	status = "okay";
-};
-
-&usbotg3 {
-	status = "okay";
-};
-
-&usbotg3_cdns3 {
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_usbotg3>;
-	dr_mode = "otg";
-	status = "okay";
-};
-
 // USB HSIC
 
 &usbh1 {
@@ -1070,10 +865,10 @@
 	status = "okay";
 };
 
-&usbphynop2 {
-	vcc-supply = <&reg_usb_hub_vcc>;
-	status = "okay";
-};
+// &usbphynop2 {
+// 	vcc-supply = <&reg_usb_hub_vcc>;
+// 	status = "okay";
+// };
 
 // ADC (voltage/current monitors)
 
@@ -1514,12 +1309,6 @@
 			IMX8QM_SCU_GPIO0_02_LSIO_GPIO0_IO30					0x06000061
 			IMX8QM_SCU_GPIO0_03_LSIO_GPIO0_IO31					0x06000061
 
-			// Debug GPIOs
-			IMX8QM_M40_GPIO0_00_LSIO_GPIO0_IO08					0x06000021
-			IMX8QM_M40_GPIO0_01_LSIO_GPIO0_IO09					0x06000021
-			IMX8QM_M41_GPIO0_00_LSIO_GPIO0_IO12					0x06000021
-			IMX8QM_M41_GPIO0_01_LSIO_GPIO0_IO13					0x06000021
-
 			// Debug switch array (no pull as pull up overwhelms the HW pull down)
 			IMX8QM_SCU_GPIO0_07_LSIO_GPIO1_IO03					0x06000061
 			IMX8QM_LVDS0_GPIO00_LSIO_GPIO1_IO04					0x06000061
@@ -1527,13 +1316,6 @@
 			IMX8QM_LVDS0_I2C0_SCL_LSIO_GPIO1_IO06				0x06000061
 			IMX8QM_LVDS0_I2C0_SDA_LSIO_GPIO1_IO07				0x06000061
 			IMX8QM_LVDS0_I2C1_SCL_LSIO_GPIO1_IO08				0x06000061
-
-			// GPIO for aux card
-			// Last two are used for panel/touchscreen resets for EC-ASM-00025-01 SBC Test PCB
-			IMX8QM_SIM0_CLK_LSIO_GPIO0_IO00						0x06000021
-			IMX8QM_SIM0_RST_LSIO_GPIO0_IO01						0x06000021
-			IMX8QM_SIM0_IO_LSIO_GPIO0_IO02						0x06000021
-			IMX8QM_SIM0_PD_LSIO_GPIO0_IO03						0x06000021
 		>;
 	};
 
@@ -1546,13 +1328,6 @@
 	pinctrl_level_shifters: levelshiftersgrp {
 		fsl,pins = <
 			IMX8QM_SPDIF0_TX_LSIO_GPIO2_IO15					0x06000021
-		>;
-	};
-
-	pinctrl_cm40_i2c: cm40i2cgrp {
-		fsl,pins = <
-			IMX8QM_M40_I2C0_SDA_M40_I2C0_SDA					0x04000020
-			IMX8QM_M40_I2C0_SCL_M40_I2C0_SCL					0x04000020
 		>;
 	};
 
@@ -1660,17 +1435,6 @@
 		>;
 	};
 
-	pinctrl_flexspi1: flexspi1grp {
-		fsl,pins = <
-			IMX8QM_QSPI1A_DATA0_LSIO_QSPI1A_DATA0				0x06000021
-			IMX8QM_QSPI1A_DATA1_LSIO_QSPI1A_DATA1				0x06000021
-			IMX8QM_QSPI1A_DATA2_LSIO_QSPI1A_DATA2				0x06000021
-			IMX8QM_QSPI1A_DATA3_LSIO_QSPI1A_DATA3				0x06000021
-			IMX8QM_QSPI1A_SS0_B_LSIO_QSPI1A_SS0_B				0x06000021
-			IMX8QM_QSPI1A_SCLK_LSIO_QSPI1A_SCLK					0x06000021
-		>;
-	};
-
 	pinctrl_flexcan1: flexcan0grp {
 		fsl,pins = <
 			IMX8QM_FLEXCAN0_TX_DMA_FLEXCAN0_TX					0x00000021
@@ -1717,16 +1481,6 @@
 		>;
 	};
 
-	pinctrl_lpspi0: lpspi0grp {
-		fsl,pins = <
-			IMX8QM_SPI0_SCK_DMA_SPI0_SCK						0x06000040
-			IMX8QM_SPI0_SDI_DMA_SPI0_SDI						0x06000040
-			IMX8QM_SPI0_SDO_DMA_SPI0_SDO						0x06000040
-			IMX8QM_SPI0_CS0_LSIO_GPIO3_IO05						0x06000040
-			IMX8QM_SPI0_CS1_LSIO_GPIO3_IO06						0x06000040
-		>;
-	};
-
 	pinctrl_lpuart1: lpuart1grp {
 		fsl,pins = <
 			IMX8QM_UART1_RX_DMA_UART1_RX						0x06000020
@@ -1747,13 +1501,6 @@
 	pinctrl_sata: satagrp {
 		fsl,pins = <
 			IMX8QM_PCIE_CTRL1_CLKREQ_B_LSIO_GPIO4_IO30			0x06000021
-		>;
-	};
-
-	pinctrl_usbotg3: usbotg3 {
-		fsl,pins = <
-			IMX8QM_LVDS0_I2C1_SDA_LSIO_GPIO1_IO09				0x06000021
-			IMX8QM_LVDS1_GPIO00_LSIO_GPIO1_IO10					0x06000021
 		>;
 	};
 
@@ -1782,46 +1529,6 @@
 			IMX8QM_USDHC2_DATA2_CONN_USDHC2_DATA2				0x00000021
 			IMX8QM_USDHC2_DATA3_CONN_USDHC2_DATA3				0x00000021
 			IMX8QM_USDHC2_VSELECT_CONN_USDHC2_VSELECT			0x00000021
-		>;
-	};
-
-	pinctrl_pwm_mipi_dsi0: mipi0_pwmgrp {
-		fsl,pins = <
-			IMX8QM_MIPI_DSI0_GPIO0_00_MIPI_DSI0_PWM0_OUT		0x06000020
-		>;
-	};
-
-	pinctrl_mipi0_lpi2c0: mipi0_lpi2c0grp {
-		fsl,pins = <
-			IMX8QM_MIPI_DSI0_I2C0_SCL_MIPI_DSI0_I2C0_SCL		0x04000020
-			IMX8QM_MIPI_DSI0_I2C0_SDA_MIPI_DSI0_I2C0_SDA		0x04000020
-			IMX8QM_MIPI_DSI0_GPIO0_01_LSIO_GPIO1_IO19			0x06000020
-		>;
-	};
-
-	pinctrl_pwm_mipi_dsi1: mipi1_pwmgrp {
-		fsl,pins = <
-			IMX8QM_MIPI_DSI1_GPIO0_00_MIPI_DSI1_PWM0_OUT		0x06000020
-		>;
-	};
-
-	pinctrl_mipi1_lpi2c0: mipi1_lpi2c0grp {
-		fsl,pins = <
-			IMX8QM_MIPI_DSI1_I2C0_SCL_MIPI_DSI1_I2C0_SCL		0x04000020
-			IMX8QM_MIPI_DSI1_I2C0_SDA_MIPI_DSI1_I2C0_SDA		0x04000020
-		>;
-	};
-
-	pinctrl_mipi1_touchscreen: mipi1_touchscreengrp {
-		fsl,pins = <
-			IMX8QM_MIPI_DSI1_GPIO0_01_LSIO_GPIO1_IO23			0x06000020
-			IMX8QM_SIM0_POWER_EN_LSIO_GPIO0_IO04				0x06000020	// Correct for EC-ASM-00025-01 SBC Test PCB
-		>;
-	};
-
-	pinctrl_mipi1_panel: mipi1_panelgrp {
-		fsl,pins = <
-			IMX8QM_SIM0_GPIO0_00_LSIO_GPIO0_IO05				0x06000020	// Correct for EC-ASM-00025-01 SBC Test PCB
 		>;
 	};
 };
