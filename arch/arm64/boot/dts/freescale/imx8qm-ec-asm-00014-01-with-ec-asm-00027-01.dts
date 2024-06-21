@@ -101,6 +101,10 @@
 
 // I2C
 
+&rtc { // Disable CPU RTC
+	status = "disabled";
+};
+
 &cm40_i2c { // Aux card I2C bus
 	#address-cells = <1>;
 	#size-cells = <0>;
@@ -118,6 +122,11 @@
 		compatible = "microchip,mcp3021";
 		reg = <0x4d>;
         reference-voltage-microvolt = <5000000>;
+	};
+
+	ext_rtc: ext-rtc@51 { // Daisy-chained RTC
+		compatible = "microcrystal,rv8263";
+		reg = <0x51>;
 	};
 };
 
