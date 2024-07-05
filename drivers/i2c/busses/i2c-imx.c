@@ -284,6 +284,8 @@ struct imx_i2c_struct {
 	struct i2c_client	*slave;
 	enum i2c_slave_event last_slave_event;
 
+	bool			multi_master;
+
 	/* For checking slave events. */
 	spinlock_t     slave_lock;
 	struct hrtimer slave_timer;
@@ -566,6 +568,9 @@ static int i2c_imx_bus_busy(struct imx_i2c_struct *i2c_imx, int for_busy, bool a
 {
 	unsigned long orig_jiffies = jiffies;
 	unsigned int temp;
+
+	if (!i2c_imx->multi_master)
+		return 0;
 
 	while (1) {
 		temp = imx_i2c_read_reg(i2c_imx, IMX_I2C_I2SR);
@@ -1750,6 +1755,12 @@ static int i2c_imx_probe(struct platform_device *pdev)
 		dev_err(&pdev->dev, "can't claim irq %d\n", irq);
 		goto rpm_disable;
 	}
+
+	/*
+	 * We use the single-master property for backward compatibility.
+	 * By default multi master mode is enabled.
+	 */
+	i2c_imx->multi_master = !of_property_read_bool(pdev->dev.of_node, "single-master");
 
 	/* Set up clock divider */
 	i2c_imx->bitrate = I2C_MAX_STANDARD_MODE_FREQ;
