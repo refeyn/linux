@@ -138,7 +138,7 @@
 	fsl,spi-num-chipselects = <2>;
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_lpspi0>;
-	cs-gpios = <&lsio_gpio0 1 GPIO_ACTIVE_LOW>,
+	cs-gpios = <&lsio_gpio3 5 GPIO_ACTIVE_LOW>,
 		<&lsio_gpio4 23 GPIO_ACTIVE_LOW>,
 		<&lsio_gpio1 30 GPIO_ACTIVE_LOW>,
 		<&lsio_gpio0 0 GPIO_ACTIVE_LOW>,
@@ -203,6 +203,8 @@
 
 	pinctrl_hog_extra: hogextragrp {
 		fsl,pins = <
+			IMX8QM_SPI0_CS0_LSIO_GPIO3_IO05						0x06000040
+
 			// Debug GPIOs
 			IMX8QM_M40_GPIO0_00_LSIO_GPIO0_IO08					0x06000021
 			IMX8QM_M40_GPIO0_01_LSIO_GPIO0_IO09					0x06000021
