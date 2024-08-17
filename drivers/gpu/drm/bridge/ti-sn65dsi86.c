@@ -694,22 +694,31 @@ static struct ti_sn65dsi86 *bridge_to_ti_sn65dsi86(struct drm_bridge *bridge)
 	return container_of(bridge, struct ti_sn65dsi86, bridge);
 }
 
-static int ti_sn_attach_host(struct auxiliary_device *adev, struct ti_sn65dsi86 *pdata)
+static int ti_sn_bridge_attach(struct drm_bridge *bridge,
+			       enum drm_bridge_attach_flags flags)
 {
-	int val;
+	int ret, val;
+	struct ti_sn65dsi86 *pdata = bridge_to_ti_sn65dsi86(bridge);
 	struct mipi_dsi_host *host;
 	struct mipi_dsi_device *dsi;
-	struct device *dev = pdata->dev;
+	struct device *dev = bridge->dev->dev;
 	const struct mipi_dsi_device_info info = { .type = "ti_sn_bridge",
 						   .channel = 0,
 						   .node = NULL,
 	};
 
+	pdata->aux.drm_dev = bridge->dev;
+	ret = drm_dp_aux_register(&pdata->aux);
+	if (ret < 0) {
+		drm_err(bridge->dev, "Failed to register DP AUX channel: %d\n", ret);
+		return ret;
+	}
+
 	host = of_find_mipi_dsi_host_by_node(pdata->host_node);
 	if (!host)
 		return -EPROBE_DEFER;
 
-	dsi = devm_mipi_dsi_device_register_full(&adev->dev, host, &info);
+	dsi = devm_mipi_dsi_device_register_full(dev, host, &info);
 	if (IS_ERR(dsi))
 		return PTR_ERR(dsi);
 
@@ -727,21 +736,9 @@ static int ti_sn_attach_host(struct auxiliary_device *adev, struct ti_sn65dsi86 
 
 	pdata->dsi = dsi;
 
-	return devm_mipi_dsi_attach(&adev->dev, dsi);
-}
-
-static int ti_sn_bridge_attach(struct drm_bridge *bridge,
-			       enum drm_bridge_attach_flags flags)
-{
-	struct ti_sn65dsi86 *pdata = bridge_to_ti_sn65dsi86(bridge);
-	int ret;
-
-	pdata->aux.drm_dev = bridge->dev;
-	ret = drm_dp_aux_register(&pdata->aux);
-	if (ret < 0) {
-		drm_err(bridge->dev, "Failed to register DP AUX channel: %d\n", ret);
-		return ret;
-	}
+	ret = devm_mipi_dsi_attach(dev, dsi);
+	if (ret < 0)
+		goto err_initted_aux;
 
 	/*
 	 * Attach the next bridge.
@@ -1321,17 +1318,7 @@ static int ti_sn_bridge_probe(struct auxiliary_device *adev,
 
 	drm_bridge_add(&pdata->bridge);
 
-	ret = ti_sn_attach_host(adev, pdata);
-	if (ret) {
-		dev_err_probe(&adev->dev, ret, "failed to attach dsi host\n");
-		goto err_remove_bridge;
-	}
-
 	return 0;
-
-err_remove_bridge:
-	drm_bridge_remove(&pdata->bridge);
-	return ret;
 }
 
 static void ti_sn_bridge_remove(struct auxiliary_device *adev)
