@@ -821,6 +821,18 @@
 	status = "okay";
 };
 
+&phyx1 {
+	status = "okay";
+};
+
+&phyx2_0 {
+	status = "okay";
+};
+
+&phyx2_1 {
+	status = "okay";
+};
+
 &phyx2_lpcg {
 	clocks = <&hsio_refa_clk>, <&hsio_refb_clk>,
 		<&hsio_refa_clk>, <&hsio_per_clk>;
