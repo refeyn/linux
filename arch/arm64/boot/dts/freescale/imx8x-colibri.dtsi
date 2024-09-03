@@ -554,6 +554,10 @@
 	enable-gpios = <&gpio_expander_43 3 GPIO_ACTIVE_HIGH>;
 };
 
+&phyx1 {
+	status = "okay";
+};
+
 /* On-module PCIe for Wi-Fi */
 &pcieb {
 	compatible = "fsl,imx8qxp-pcie", "snps,dw-pcie";
