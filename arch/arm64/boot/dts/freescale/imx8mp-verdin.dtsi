@@ -459,6 +459,8 @@
 			  "SODIMM_44";
 };
 
+/delete-node/ &gpu_reserved;
+
 /* On-module I2C */
 &i2c1 {
 	clock-frequency = <400000>;
@@ -769,6 +771,11 @@
 		reg = <0x57>;
 		status = "disabled";
 	};
+};
+
+&mix_gpu_ml {
+	/* Do not use gpu_reserved memory area and rely on contiguous_mem */
+	/delete-property/ memory-region;
 };
 
 /* Verdin PCIE_1 */
