@@ -154,6 +154,7 @@ dtb-$(CONFIG_ARCH_MXC) += imx8mq-ddr3l-val.dtb imx8mq-ddr4-val.dtb imx8mq-ddr4-v
 dtb-$(CONFIG_ARCH_MXC) += imx8mq-evk-pcie-ep.dtb
 dtb-$(CONFIG_ARCH_MXC) += imx8qm-mek.dtb
 dtb-$(CONFIG_ARCH_MXC) += imx8qm-ec-asm-00014-01-with-ec-asm-00025-02.dtb imx8qm-ec-asm-00014-01-with-ec-asm-00027-01.dtb
+dtb-$(CONFIG_ARCH_MXC) += imx8qm-ec-asm-00014-03-with-ec-asm-00025-02.dtb imx8qm-ec-asm-00014-03-with-ec-asm-00027-01.dtb
 dtb-$(CONFIG_ARCH_MXC) += imx8qxp-ai_ml.dtb
 dtb-$(CONFIG_ARCH_MXC) += imx8qxp-colibri-eval-v3.dtb
 dtb-$(CONFIG_ARCH_MXC) += imx8qxp-mek.dtb

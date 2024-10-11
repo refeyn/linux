@@ -1,0 +1,247 @@
+// SPDX-License-Identifier: GPL-2.0+
+/*
+ * Copyright 2024 Refeyn
+ *	Matthew Joyce <matthew.joyce@refeyn.com>
+ */
+
+/ {
+	reg_usb_otg3_vbus: regulator-usbotg3-vbus {
+		compatible = "regulator-fixed";
+		regulator-name = "usb_otg3_vbus";
+		regulator-min-microvolt = <5000000>;
+		regulator-max-microvolt = <5000000>;
+		gpio = <&lsio_gpio1 9 GPIO_ACTIVE_HIGH>;
+		over-current-gpios = <&lsio_gpio1 10 GPIO_ACTIVE_HIGH>;
+		enable-active-high;
+		regulator-always-on;
+	};
+};
+
+// Touchscreen connector
+
+&i2c0_mipi1 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_mipi1_lpi2c0>;
+	clock-frequency = <100000>;
+	status = "okay";
+
+	touchscreen1: touchscreen@41 {
+		#address-cells = <1>;
+		#size-cells = <0>;
+		compatible = "ilitek,ili251x";
+		reg = <0x41>;
+
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_mipi1_touchscreen>;
+
+		interrupt-parent = <&lsio_gpio1>;
+		interrupts = <23 IRQ_TYPE_LEVEL_LOW>;
+		reset-gpios = <&lsio_gpio0 4 GPIO_ACTIVE_LOW>; // AUX_GPIO_4
+		wakeup-source;
+	};
+};
+
+&mipi1_dphy {
+	status = "okay";
+};
+
+&mipi_dsi1_backlight {
+	status = "okay";
+};
+
+&pwm_mipi1 {
+    pinctrl-names = "default";
+    pinctrl-0 = <&pinctrl_pwm_mipi_dsi1>;
+	status = "okay";
+};
+
+&mipi1_dsi_host {
+	status = "okay";
+	fsl,clock-drop-level = <2>;
+
+	panel@0 {
+		#address-cells = <1>;
+		#size-cells = <0>;
+		compatible = "densitron,dmt101f3nmcmu-1a";
+		reg = <0>;
+
+		rotation = <90>;
+
+		backlight = <&mipi_dsi1_backlight>;
+
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_mipi1_panel>;
+		reset-gpios = <&lsio_gpio0 5 GPIO_ACTIVE_HIGH>; // AUX_GPIO_5
+
+		port@0 {
+			reg = <0>;
+			panel1_in: endpoint {
+				remote-endpoint = <&mipi1_panel_out>;
+			};
+		};
+	};
+
+	ports {
+		port@1 {
+			reg = <1>;
+			mipi1_panel_out: endpoint {
+				remote-endpoint = <&panel1_in>;
+			};
+		};
+	};
+};
+
+// I2C
+
+&cm40_i2c { // Aux card I2C bus
+	#address-cells = <1>;
+	#size-cells = <0>;
+	clock-frequency = <100000>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_cm40_i2c>;
+	status = "okay";
+
+	// On EC-ASM-00025-01 SBC Test PCB this these pins can be used for SCFW UART
+};
+
+// USB OTG
+
+&usb3_phy {
+	status = "okay";
+};
+
+&usbotg3 {
+	status = "okay";
+};
+
+&usbotg3_cdns3 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_usbotg3>;
+	dr_mode = "otg";
+	status = "okay";
+};
+
+// SPI bus
+
+&lpspi0 { // Debug SPI
+	#address-cells = <1>;
+	#size-cells = <0>;
+	fsl,spi-num-chipselects = <2>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_lpspi0>;
+	cs-gpios = <&lsio_gpio3 5 GPIO_ACTIVE_LOW>,
+		<&lsio_gpio3 6 GPIO_ACTIVE_LOW>;
+	assigned-clock-rates = <60000000>;
+	status = "okay";
+
+	// Add spidev devices
+	spidev_debug0: spi@0 {
+		reg = <0>;
+		compatible = "rohm,dh2228fv";
+		spi-max-frequency = <30000000>;
+	};
+
+	spidev_debug1: spi@1 {
+		reg = <1>;
+		compatible = "rohm,dh2228fv";
+		spi-max-frequency = <30000000>;
+	};
+};
+
+// QSPI
+
+&flexspi1 { // Aux board QSPI
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_flexspi1>;
+	nxp,fspi-dll-slvdly = <4>;
+	status = "okay";
+
+	// No device on EC-ASM-00025-01 SBC Test PCB
+};
+
+// Pin mux control
+
+&iomuxc {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_hog>, <&pinctrl_hog_extra>;
+
+	pinctrl_hog_extra: hogextragrp {
+		fsl,pins = <
+			// Debug GPIOs
+			IMX8QM_M40_GPIO0_00_LSIO_GPIO0_IO08					0x06000021
+			IMX8QM_M40_GPIO0_01_LSIO_GPIO0_IO09					0x06000021
+			IMX8QM_M41_GPIO0_00_LSIO_GPIO0_IO12					0x06000021
+			IMX8QM_M41_GPIO0_01_LSIO_GPIO0_IO13					0x06000021
+
+			// GPIO for aux card
+			// Last two are used for panel/touchscreen resets for EC-ASM-00025-01 SBC Test PCB
+			IMX8QM_SIM0_CLK_LSIO_GPIO0_IO00						0x06000021
+			IMX8QM_SIM0_RST_LSIO_GPIO0_IO01						0x06000021
+			IMX8QM_SIM0_IO_LSIO_GPIO0_IO02						0x06000021
+			IMX8QM_SIM0_PD_LSIO_GPIO0_IO03						0x06000021
+		>;
+	};
+
+	pinctrl_pwm_mipi_dsi1: mipi1_pwmgrp {
+		fsl,pins = <
+			IMX8QM_MIPI_DSI1_GPIO0_00_MIPI_DSI1_PWM0_OUT		0x06000020
+		>;
+	};
+
+	pinctrl_mipi1_lpi2c0: mipi1_lpi2c0grp {
+		fsl,pins = <
+			IMX8QM_MIPI_DSI1_I2C0_SCL_MIPI_DSI1_I2C0_SCL		0x04000020
+			IMX8QM_MIPI_DSI1_I2C0_SDA_MIPI_DSI1_I2C0_SDA		0x04000020
+		>;
+	};
+
+	pinctrl_mipi1_touchscreen: mipi1_touchscreengrp {
+		fsl,pins = <
+			IMX8QM_MIPI_DSI1_GPIO0_01_LSIO_GPIO1_IO23			0x06000020
+			IMX8QM_SIM0_POWER_EN_LSIO_GPIO0_IO04				0x06000020 // AUX_GPIO_4
+		>;
+	};
+
+	pinctrl_mipi1_panel: mipi1_panelgrp {
+		fsl,pins = <
+			IMX8QM_SIM0_GPIO0_00_LSIO_GPIO0_IO05				0x06000020 // AUX_GPIO_5
+		>;
+	};
+
+	pinctrl_cm40_i2c: cm40i2cgrp {
+		fsl,pins = <
+			IMX8QM_M40_I2C0_SDA_M40_I2C0_SDA					0x04000020
+			IMX8QM_M40_I2C0_SCL_M40_I2C0_SCL					0x04000020
+		>;
+	};
+
+	pinctrl_usbotg3: usbotg3 {
+		fsl,pins = <
+			IMX8QM_LVDS0_I2C1_SDA_LSIO_GPIO1_IO09				0x06000021
+			IMX8QM_LVDS1_GPIO00_LSIO_GPIO1_IO10					0x06000021
+		>;
+	};
+
+	pinctrl_lpspi0: lpspi0grp {
+		fsl,pins = <
+			IMX8QM_SPI0_SCK_DMA_SPI0_SCK						0x06000040
+			IMX8QM_SPI0_SDI_DMA_SPI0_SDI						0x06000040
+			IMX8QM_SPI0_SDO_DMA_SPI0_SDO						0x06000040
+			IMX8QM_SPI0_CS0_LSIO_GPIO3_IO05						0x06000040
+			IMX8QM_SPI0_CS1_LSIO_GPIO3_IO06						0x06000040
+		>;
+	};
+
+	pinctrl_flexspi1: flexspi1grp {
+		fsl,pins = <
+			IMX8QM_QSPI1A_DATA0_LSIO_QSPI1A_DATA0				0x06000021
+			IMX8QM_QSPI1A_DATA1_LSIO_QSPI1A_DATA1				0x06000021
+			IMX8QM_QSPI1A_DATA2_LSIO_QSPI1A_DATA2				0x06000021
+			IMX8QM_QSPI1A_DATA3_LSIO_QSPI1A_DATA3				0x06000021
+			IMX8QM_QSPI1A_SS0_B_LSIO_QSPI1A_SS0_B				0x06000021
+			IMX8QM_QSPI1A_SCLK_LSIO_QSPI1A_SCLK					0x06000021
+		>;
+	};
+};

@@ -165,28 +165,6 @@
 
 	// Regulators
 
-	reg_usb2_port1_vbus: regulator-usb2-port1-vbus {
-		compatible = "regulator-fixed";
-		regulator-name = "reg_usb2_port1_vbus";
-		regulator-min-microvolt = <5000000>;
-		regulator-max-microvolt = <5000000>;
-		gpio = <&lsio_gpio1 13 GPIO_ACTIVE_HIGH>;
-		over-current-gpios = <&lsio_gpio1 15 GPIO_ACTIVE_HIGH>;
-		enable-active-high;
-		regulator-always-on;
-	};
-
-	reg_usb2_port2_vbus: regulator-usb2-port2-vbus {
-		compatible = "regulator-fixed";
-		regulator-name = "reg_usb2_port2_vbus";
-		regulator-min-microvolt = <5000000>;
-		regulator-max-microvolt = <5000000>;
-		gpio = <&lsio_gpio1 14 GPIO_ACTIVE_HIGH>;
-		over-current-gpios = <&lsio_gpio2 14 GPIO_ACTIVE_HIGH>;
-		enable-active-high;
-		regulator-always-on;
-	};
-
 	reg_pmic_ldo_vselect0: regulator-pmic-ldo-vselect0 {
 		compatible = "regulator-fixed";
 		pinctrl-names = "default";
@@ -215,13 +193,6 @@
 		regulator-name = "vref_1v8";
 		regulator-min-microvolt = <1800000>;
 		regulator-max-microvolt = <1800000>;
-	};
-
-	reg_usb_hub_vcc: regulator-usb-hub-vcc {
-		compatible = "regulator-fixed";
-		regulator-name = "vref_3v3_usb";
-		regulator-min-microvolt = <3300000>;
-		regulator-max-microvolt = <3300000>;
 	};
 
 	// M4 core communication
@@ -381,15 +352,6 @@
 
 		sense-resistor-micro-ohms = <1>;
 		sense-gain-mult = <1>;
-	};
-
-	iio-hwmon {
-		compatible = "iio-hwmon";
-		io-channels = <&sys_24v_voltage 0>, <&sys_24v_current 0>,
-			<&sys_aux24v_voltage 0>, <&sys_aux24v_current 0>,
-			<&sys_5v_voltage 0>, <&sys_5v_current 0>,
-			<&sys_3v3_voltage 0>, <&sys_3v3_current 0>;
-		io-channel-names = "24v-voltage", "24v-current", "aux24v-voltage", "aux24v-current", "5v-voltage", "5v-current", "3v3-voltage", "3v3-current";
 	};
 
 	// Fans
@@ -669,18 +631,6 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_i2c0>;
 	status = "okay";
-
-	usb-hub@8 {
-		compatible = "smsc,usb3503a";
-		reg = <0x08>;
-		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_usb_hsic_hub>;
-		disabled-ports = <3>; // Only port 1 and 2 is connected
-		connect-gpios = <&lsio_gpio1 12 GPIO_ACTIVE_LOW>;
-		intn-gpios = <&lsio_gpio1 11 GPIO_ACTIVE_LOW>;
-		initial-mode = <1>; // Hub mode
-		refclk-frequency = <26000000>;
-	};
 };
 
 &i2c1 { // I2C bus with temperature sensor
@@ -851,24 +801,6 @@
 	status = "okay";
 	no-1-8-v;
 };
-
-// USB HSIC
-
-&usbh1 {
-	adp-disable;
-	disable-over-current;
-	hnp-disable;
-	pinctrl-names = "idle", "active";
-	pinctrl-0 = <&pinctrl_usbh1>;
-	pinctrl-1 = <&pinctrl_usbh1_active>;
-	srp-disable;
-	status = "okay";
-};
-
-// &usbphynop2 {
-// 	vcc-supply = <&reg_usb_hub_vcc>;
-// 	status = "okay";
-// };
 
 // ADC (voltage/current monitors)
 
@@ -1410,20 +1342,6 @@
 		>;
 	};
 
-	pinctrl_usbh1: usbh1grp {
-		fsl,pins = <
-			IMX8QM_USB_HSIC0_DATA_CONN_USB_HSIC0_DATA			0x000000CF
-			IMX8QM_USB_HSIC0_STROBE_CONN_USB_HSIC0_STROBE		0x000000CF
-		>;
-	};
-
-	pinctrl_usbh1_active: usbh1activegrp {
-		fsl,pins = <
-			IMX8QM_USB_HSIC0_DATA_CONN_USB_HSIC0_DATA			0x000000CF
-			IMX8QM_USB_HSIC0_STROBE_CONN_USB_HSIC0_STROBE		0x000000FF
-		>;
-	};
-
 	pinctrl_flexspi0: flexspi0grp {
 		fsl,pins = <
 			IMX8QM_QSPI0A_DATA0_LSIO_QSPI0A_DATA0				0x06000021
@@ -1467,17 +1385,6 @@
 		fsl,pins = <
 			IMX8QM_GPT1_CLK_DMA_I2C2_SCL						0x04000020
 			IMX8QM_GPT1_CAPTURE_DMA_I2C2_SDA					0x04000020
-		>;
-	};
-
-	pinctrl_usb_hsic_hub: hsic_hubgrp {
-		fsl,pins = <
-			IMX8QM_LVDS1_GPIO01_LSIO_GPIO1_IO11					0x06000021
-			IMX8QM_LVDS1_I2C0_SCL_LSIO_GPIO1_IO12				0x06000021
-			IMX8QM_LVDS1_I2C0_SDA_LSIO_GPIO1_IO13				0x06000021
-			IMX8QM_LVDS1_I2C1_SCL_LSIO_GPIO1_IO14				0x06000021
-			IMX8QM_LVDS1_I2C1_SDA_LSIO_GPIO1_IO15				0x06000021
-			IMX8QM_SPDIF0_RX_LSIO_GPIO2_IO14					0x06000021
 		>;
 	};
 

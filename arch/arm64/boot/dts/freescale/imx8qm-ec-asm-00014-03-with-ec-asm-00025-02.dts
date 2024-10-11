@@ -6,9 +6,9 @@
 
 /dts-v1/;
 
-#include "imx8qm-ec-asm-00014-01.dtsi"
+#include "imx8qm-ec-asm-00014-03.dtsi"
 #include "imx8qm-ec-asm-00025-02.dtsi"
 
 / {
-	model = "Refeyn i.MX8QM EC-ASM-00014-01 with EC-ASM-00025-02";
+	model = "Refeyn i.MX8QM EC-ASM-00014-03 with EC-ASM-00025-02";
 };

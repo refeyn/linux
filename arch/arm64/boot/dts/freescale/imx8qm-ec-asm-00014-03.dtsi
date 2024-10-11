@@ -1,0 +1,100 @@
+// SPDX-License-Identifier: GPL-2.0+
+/*
+ * Copyright 2024 Refeyn
+ *	Matthew Joyce <matthew.joyce@refeyn.com>
+ */
+
+#include "imx8qm-ec-asm-00014-01.dtsi"
+
+/ {
+	model = "Refeyn i.MX8QM EC-ASM-00014-03";
+    compatible = "fsl,imx8qm-ec-asm-00014-03", "fsl,imx8qm";
+
+    reg_usb2_port1_vbus: regulator-usb2-port1-vbus {
+        compatible = "regulator-fixed";
+        regulator-name = "reg_usb2_port1_vbus";
+        regulator-min-microvolt = <5000000>;
+        regulator-max-microvolt = <5000000>;
+        gpio = <&lsio_gpio1 13 GPIO_ACTIVE_HIGH>;
+        over-current-gpios = <&lsio_gpio1 15 GPIO_ACTIVE_HIGH>;
+        enable-active-high;
+        regulator-always-on;
+    };
+
+    reg_usb2_port2_vbus: regulator-usb2-port2-vbus {
+        compatible = "regulator-fixed";
+        regulator-name = "reg_usb2_port2_vbus";
+        regulator-min-microvolt = <5000000>;
+        regulator-max-microvolt = <5000000>;
+        gpio = <&lsio_gpio1 14 GPIO_ACTIVE_HIGH>;
+        over-current-gpios = <&lsio_gpio2 14 GPIO_ACTIVE_HIGH>;
+        enable-active-high;
+        regulator-always-on;
+    };
+
+    reg_usb_hub_vcc: regulator-usb-hub-vcc {
+        compatible = "regulator-fixed";
+        regulator-name = "vref_3v3_usb";
+        regulator-min-microvolt = <3300000>;
+        regulator-max-microvolt = <3300000>;
+    };
+};
+
+// USB HSIC
+
+&usbh1 {
+	adp-disable;
+	disable-over-current;
+	hnp-disable;
+	pinctrl-names = "idle", "active";
+	pinctrl-0 = <&pinctrl_usbh1>;
+	pinctrl-1 = <&pinctrl_usbh1_active>;
+	srp-disable;
+	status = "okay";
+};
+
+// &usbphynop2 {
+// 	vcc-supply = <&reg_usb_hub_vcc>;
+// 	status = "okay";
+// };
+
+&i2c0 { // I2C bus with USB HSIC hub
+    usb-hub@8 {
+        compatible = "smsc,usb3503a";
+        reg = <0x08>;
+        pinctrl-names = "default";
+        pinctrl-0 = <&pinctrl_usb_hsic_hub>;
+        disabled-ports = <3>; // Only port 1 and 2 is connected
+        connect-gpios = <&lsio_gpio1 12 GPIO_ACTIVE_LOW>;
+        intn-gpios = <&lsio_gpio1 11 GPIO_ACTIVE_LOW>;
+        initial-mode = <1>; // Hub mode
+        refclk-frequency = <26000000>;
+    };
+};
+
+&iomuxc {
+    pinctrl_usbh1: usbh1grp {
+        fsl,pins = <
+        IMX8QM_USB_HSIC0_DATA_CONN_USB_HSIC0_DATA			0x000000CF
+        IMX8QM_USB_HSIC0_STROBE_CONN_USB_HSIC0_STROBE		0x000000CF
+        >;
+    };
+
+    pinctrl_usbh1_active: usbh1activegrp {
+        fsl,pins = <
+        IMX8QM_USB_HSIC0_DATA_CONN_USB_HSIC0_DATA			0x000000CF
+        IMX8QM_USB_HSIC0_STROBE_CONN_USB_HSIC0_STROBE		0x000000FF
+        >;
+    };
+
+    pinctrl_usb_hsic_hub: hsic_hubgrp {
+        fsl,pins = <
+        IMX8QM_LVDS1_GPIO01_LSIO_GPIO1_IO11					0x06000021
+        IMX8QM_LVDS1_I2C0_SCL_LSIO_GPIO1_IO12				0x06000021
+        IMX8QM_LVDS1_I2C0_SDA_LSIO_GPIO1_IO13				0x06000021
+        IMX8QM_LVDS1_I2C1_SCL_LSIO_GPIO1_IO14				0x06000021
+        IMX8QM_LVDS1_I2C1_SDA_LSIO_GPIO1_IO15				0x06000021
+        IMX8QM_SPDIF0_RX_LSIO_GPIO2_IO14					0x06000021
+        >;
+    };
+};
