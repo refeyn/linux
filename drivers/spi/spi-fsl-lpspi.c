@@ -151,17 +151,23 @@ static inline int is_imx95_lpspi(struct fsl_lpspi_data *d)
 	return d->devtype_data->devtype == IMX95_LPSPI;
 };
 
-
+/*
+ * ERR051608 fixed or not:
+ * https://www.nxp.com/docs/en/errata/i.MX93_1P87f.pdf
+ */
 static struct fsl_lpspi_devtype_data imx93_lpspi_devtype_data = {
 	.devtype = IMX93_LPSPI,
+	.prescale_max = 1,
 };
 
 static struct fsl_lpspi_devtype_data imx95_lpspi_devtype_data = {
 	.devtype = IMX95_LPSPI,
+	.prescale_max = 7,
 };
 
 static struct fsl_lpspi_devtype_data imx7ulp_lpspi_devtype_data = {
 	.devtype = IMX7ULP_LPSPI,
+	.prescale_max = 7,
 };
 
 /*
@@ -351,10 +357,7 @@ static int fsl_lpspi_set_bitrate(struct fsl_lpspi_data *fsl_lpspi)
 	u8 prescale;
 
 	perclk_rate = clk_get_rate(fsl_lpspi->clk_per);
-	if (!perclk_rate) {
-		dev_err(fsl_lpspi->dev, "per-clk rate was not set\n");
-		return -EINVAL;
-	}
+	prescale_max = fsl_lpspi->devtype_data->prescale_max;
 
 	if (!config.speed_hz) {
 		dev_err(fsl_lpspi->dev,
