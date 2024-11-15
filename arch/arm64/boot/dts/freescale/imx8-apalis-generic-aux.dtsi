@@ -1,0 +1,26 @@
+// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
+/*
+ * Copyright 2024 Refeyn
+ */
+
+// Common aux functions
+
+/* Apalis I2C6 */
+&i2c0_lvds0 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_lpi2c0_lvds0>;
+	status = "okay";
+
+	aux_eeprom: aux-eeprom@50 {
+		compatible = "atmel,24c256";
+		reg = <0x50>;
+	};
+};
+
+
+&iomuxc {
+	pinctrl_lpi2c0_lvds0: lpi2c0lvds0grp {
+		fsl,pins = <IMX8QM_LVDS0_I2C0_SCL_LVDS0_I2C0_SCL		0x04000020>,
+				<IMX8QM_LVDS0_I2C0_SDA_LVDS0_I2C0_SDA			0x04000020>;
+	};
+};

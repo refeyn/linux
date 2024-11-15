@@ -1,0 +1,240 @@
+// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
+/*
+ * Copyright 2024 Refeyn
+ */
+
+#include <dt-bindings/leds/common.h>
+#include "imx8-apalis-generic-aux.dtsi"
+
+/* Aux GPIOS
+ * GPIO2_IO26 LED 0
+ * GPIO2_IO28 touch int
+ * GPIO0_IO13 (4) touch reset
+ * GPIO3_IO26 (7) power enable
+ */
+
+/ {
+	aux-leds {
+		compatible = "gpio-leds";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_aux_led>;
+
+		led-0 {
+			color = <LED_COLOR_ID_RED>;
+			default-state = "on";
+			function = LED_FUNCTION_INDICATOR;
+            gpios = <&lsio_gpio2 26 GPIO_ACTIVE_HIGH>;
+            linux,default-trigger = "timer";
+		};
+	};
+
+	mipi_dsi1_backlight: mipi_backlight@1 {
+		compatible = "pwm-backlight";
+		pwms = <&pwm_mipi1 0 2000000 0>; // 500Hz
+		brightness-levels = <0 4 8 16 32 64 128 255>;
+		default-brightness-level = <6>;
+	};
+
+    reg_5v_aux: regulator-5v-aux {
+        compatible = "regulator-fixed";
+        pinctrl-names = "default";
+        pinctrl-0 = <&pinctrl_5v_aux_regulator>;
+        regulator-name = "reg_5v_aux";
+        regulator-min-microvolt = <5000000>;
+        regulator-max-microvolt = <5000000>;
+        gpio = <&lsio_gpio3 26 GPIO_ACTIVE_HIGH>;
+        enable-active-high;
+        regulator-always-on;
+    };
+};
+
+
+// Touchscreen connector
+
+&i2c0_mipi1 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_mipi1_lpi2c0>;
+	clock-frequency = <100000>;
+	status = "okay";
+
+	touchscreen1: touchscreen@41 {
+		#address-cells = <1>;
+		#size-cells = <0>;
+		compatible = "ilitek,ili251x";
+		reg = <0x41>;
+
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_mipi1_touchscreen>;
+
+		interrupt-parent = <&lsio_gpio2>;
+		interrupts = <28 IRQ_TYPE_LEVEL_LOW>;
+		reset-gpios = <&lsio_gpio0 13 GPIO_ACTIVE_LOW>; // AUX_GPIO_4
+		wakeup-source;
+	};
+};
+
+// DSI1 - aux-board connector (backlight is defined above)
+
+&mipi1_subsys {
+	// Clocks for the MIPI DSI1 PWM subsystem
+	mipi1_pwm_lpcg_ipg_clk_highfreq: clock-controller@57223010 {
+		compatible = "fsl,imx8qxp-lpcg";
+		reg = <0x57223010 0x4>;
+		#clock-cells = <1>;
+		clocks = <&clk IMX_SC_R_MIPI_1_PWM_0 IMX_SC_PM_CLK_PER>;
+		bit-offset = <0>;
+		clock-output-names = "mipi1_pwm_lpcg_ipg_clk_highfreq";
+		power-domains = <&pd IMX_SC_R_MIPI_1_PWM_0>;
+	};
+
+	mipi1_pwm_lpcg_ipg_s_clk: clock-controller@5722300c {
+		compatible = "fsl,imx8qxp-lpcg";
+		reg = <0x5722300c 0x4>;
+		#clock-cells = <1>;
+		clocks = <&dsi_ipg_clk>;
+		bit-offset = <0>;
+		clock-output-names = "mipi1_pwm_lpcg_ipg_s_clk";
+		power-domains = <&pd IMX_SC_R_MIPI_1_PWM_0>;
+	};
+
+	mipi1_pwm_lpcg_ipg_clk: clock-controller@57223008 {
+		compatible = "fsl,imx8qxp-lpcg";
+		reg = <0x57223008 0x4>;
+		#clock-cells = <1>;
+		clocks = <&mipi1_pwm_lpcg_ipg_s_clk 0>;
+		bit-offset = <0>;
+		clock-output-names = "mipi1_pwm_lpcg_ipg_clk";
+		power-domains = <&pd IMX_SC_R_MIPI_1_PWM_0>;
+	};
+
+	// Actual PWM controller
+	pwm_mipi1: pwm@57224000 {
+		compatible = "fsl,imx8qm-pwm", "fsl,imx27-pwm";
+		reg = <0x57224000 0x1000>;
+		clocks = <&mipi1_pwm_lpcg_ipg_clk_highfreq 0>,
+				<&mipi1_pwm_lpcg_ipg_clk 0>;
+		clock-names = "per", "ipg";
+		assigned-clocks = <&clk IMX_SC_R_MIPI_1_PWM_0 IMX_SC_PM_CLK_PER>;
+		assigned-clock-rates = <24000000>;
+		#pwm-cells = <2>;
+		power-domains = <&pd IMX_SC_R_MIPI_1_PWM_0>;
+		status = "disabled";
+	};
+};
+
+&pwm_mipi1 {
+    pinctrl-names = "default";
+    pinctrl-0 = <&pinctrl_pwm_mipi_dsi1>;
+	status = "okay";
+};
+
+/* Apalis SPI1 */
+&lpspi0 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+    pinctrl-names = "default";
+    pinctrl-0 = <&pinctrl_lpspi0cs>;
+    cs-gpios = <&lsio_gpio4 2 GPIO_ACTIVE_LOW>;
+    assigned-clock-rates = <60000000>;
+    status = "okay";
+
+    laser-driver-control-spi@0 { // Laser Driver Control
+        /* Use compatible "rohm,dh2228fv" to bind spidev driver */
+        reg = <0>;
+        compatible = "rohm,dh2228fv";
+        spi-max-frequency = <30000000>;
+    };
+};
+
+/* Apalis USBH4 SuperSpeed */
+&usbotg3_cdns3 {
+    status = "okay";
+};
+
+&i2c4 {
+    pinctrl-names = "default";
+    pinctrl-0 = <&pinctrl_lpi2c4>;
+    #address-cells = <1>;
+    #size-cells = <0>;
+    clock-frequency = <100000>;
+    status = "okay";
+
+    ads1015@48 {
+        compatible = "ti,ads1015";
+        reg = <0x48>;
+        #address-cells = <1>;
+        #size-cells = <0>;
+
+        channel@4 {
+            reg = <4>;
+            ti,gain = <0>;
+            ti,datarate = <0>;
+        };
+
+        channel@5 {
+            reg = <5>;
+            ti,gain = <0>;
+            ti,datarate = <0>;
+        };
+
+        channel@6 {
+            reg = <6>;
+            ti,gain = <0>;
+            ti,datarate = <0>;
+        };
+
+        channel@7 {
+            reg = <7>;
+            ti,gain = <0>;
+            ti,datarate = <0>;
+        };
+    };
+};
+
+&iomuxc {
+    pinctrl-0 = <&pinctrl_hog>, <&pinctrl_hog_extra>;
+
+    pinctrl_hog_extra: hogextragrp {
+        fsl,pins = <IMX8QM_M41_GPIO0_00_LSIO_GPIO0_IO12		0x06000061>, /* AUX 3 Shutter enable */
+                <IMX8QM_FLEXCAN2_RX_LSIO_GPIO4_IO01			0x06000061>, /* AUX 5 Screen reset */
+                <IMX8QM_ESAI0_TX4_RX1_LSIO_GPIO2_IO30		0x06000061>, /* Interlock 1 */
+                <IMX8QM_ESAI0_TX5_RX0_LSIO_GPIO2_IO31		0x06000061>; /* Interlock 2 */
+    };
+
+    pinctrl_aux_led: auxledgrp {
+        fsl,pins = <IMX8QM_ESAI0_TX0_LSIO_GPIO2_IO26		0x06000061>;
+    };
+
+    pinctrl_pwm_mipi_dsi1: mipi1_pwmgrp {
+        fsl,pins = <IMX8QM_MIPI_DSI1_GPIO0_00_MIPI_DSI1_PWM0_OUT	0x06000020>;
+    };
+
+    pinctrl_mipi1_lpi2c0: mipi1_lpi2c0grp {
+        fsl,pins = <IMX8QM_MIPI_DSI1_I2C0_SCL_MIPI_DSI1_I2C0_SCL	0x04000020>,
+                <IMX8QM_MIPI_DSI1_I2C0_SDA_MIPI_DSI1_I2C0_SDA		0x04000020>;
+    };
+
+    pinctrl_mipi1_touchscreen: mipi1_touchscreengrp {
+        fsl,pins = <IMX8QM_ESAI0_TX2_RX3_LSIO_GPIO2_IO28	0x04000020>,
+                <IMX8QM_M41_GPIO0_01_LSIO_GPIO0_IO13		0x04000020>;
+    };
+
+    pinctrl_5v_aux_regulator: aux5vreggrp {
+        fsl,pins = <IMX8QM_MLB_SIG_LSIO_GPIO3_IO26			0x06000061>;
+    };
+
+    pinctrl_lpi2c4: lpi2c4grp {
+        fsl,pins = <IMX8QM_ENET1_MDIO_DMA_I2C4_SDA			0x04000020>,
+                <IMX8QM_ENET1_MDIO_DMA_I2C4_SDA				0x04000020>;
+    };
+
+    /* Apalis SPI1 */
+    pinctrl_lpspi0cs: lpspi0grp {
+        fsl,pins = <IMX8QM_SPI0_SCK_DMA_SPI0_SCK			0x0600004c>,
+                <IMX8QM_SPI0_SDO_DMA_SPI0_SDO			0x0600004c>,
+                <IMX8QM_SPI0_SDI_DMA_SPI0_SDI			0x0600004c>,
+                <IMX8QM_FLEXCAN2_TX_LSIO_GPIO4_IO02			0x0600004c>; // Not using CS0
+    };
+};

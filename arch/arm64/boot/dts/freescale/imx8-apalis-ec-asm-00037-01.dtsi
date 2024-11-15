@@ -1,0 +1,376 @@
+// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
+/*
+ * Copyright 2024 Refeyn
+ */
+
+#include <dt-bindings/leds/common.h>
+#include <dt-bindings/input/linux-event-codes.h>
+#include "imx8-apalis-hdmi-carrier.dtsi"
+
+/ {
+	aliases {
+		rtc0 = &rtc_i2c;
+		rtc1 = &rtc;
+	};
+
+	leds {
+		compatible = "gpio-leds";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_leds>;
+
+		/* LED0 Green */
+		led-0 {
+			color = <LED_COLOR_ID_GREEN>;
+			default-state = "off";
+			function = LED_FUNCTION_STATUS;
+            gpios = <&lsio_gpio2 22 GPIO_ACTIVE_HIGH>;
+            linux,default-trigger = "heartbeat";
+		};
+
+		/* LED1 Red */
+		led-1 {
+			color = <LED_COLOR_ID_RED>;
+			default-state = "off";
+			function = LED_FUNCTION_STATUS;
+            gpios = <&lsio_gpio2 23 GPIO_ACTIVE_HIGH>;
+            panic-indicator;
+		};
+
+		/* LED2 Green */
+		led-2 {
+			color = <LED_COLOR_ID_GREEN>;
+			default-state = "off";
+			function = LED_FUNCTION_STATUS;
+			gpios = <&lsio_gpio0 5 GPIO_ACTIVE_HIGH>;
+        };
+
+        /* LED3 Red */
+        led-3 {
+            color = <LED_COLOR_ID_RED>;
+            default-state = "off";
+            function = LED_FUNCTION_STATUS;
+            gpios = <&lsio_gpio0 1 GPIO_ACTIVE_HIGH>;
+        };
+
+        /* SATA activity green */
+        led-sata-act {
+            color = <LED_COLOR_ID_GREEN>;
+            default-state = "off";
+            function = LED_FUNCTION_DISK_ACTIVITY;
+            gpios = <&lsio_gpio2 8 GPIO_ACTIVE_LOW>;
+            linux,default-trigger = "mmc0";
+        };
+	};
+
+    buzzer {
+        compatible = "gpio-beeper";
+        pinctrl-names = "default";
+        pinctrl-0 = <&pinctrl_buzzer>;
+        gpios = <&lsio_gpio1 8 GPIO_ACTIVE_HIGH>;
+    };
+
+    gpio-keys {
+        compatible = "gpio-keys";
+        pinctrl-names = "default";
+        pinctrl-0 = <&pinctrl_gpiobtns>;
+
+        button-power {
+            label = "Power Button";
+            interrupt-parent = <&lsio_gpio4>;
+            interrupts = <26 IRQ_TYPE_LEVEL_LOW>;
+            gpios = <&lsio_gpio4 26 GPIO_ACTIVE_LOW>;
+            linux,code = <KEY_POWER>;
+            wakeup-source;
+        };
+
+        button-factory {
+            label = "FACTORY_DEFAULT";
+            interrupt-parent = <&lsio_gpio5>;
+            interrupts = <26 IRQ_TYPE_LEVEL_LOW>;
+            gpios = <&lsio_gpio5 26 GPIO_ACTIVE_LOW>;
+            linux,code = <KEY_F1>;
+            wakeup-source;
+        };
+    };
+
+    gpio-poweroff {
+        compatible = "gpio-poweroff";
+        pinctrl-names = "default";
+        pinctrl-0 = <&pinctrl_gpiopwroff>;
+        gpios = <&lsio_gpio4 25 GPIO_ACTIVE_LOW>;
+    };
+
+    // Fans
+
+   pwm-fan0 {
+        compatible = "pwm-fan";
+        pinctrl-names = "default";
+        pinctrl-0 = <&pinctrl_fan0>;
+        pwms = <&lsio_pwm2 0 100000 PWM_POLARITY_INVERTED>;
+        interrupt-parent = <&lsio_gpio4>;
+        interrupts = <22 IRQ_TYPE_EDGE_FALLING>;
+        pulses-per-revolution = <2>;
+        cooling-levels = <0 50 100 150 200 255>;
+        #cooling-cells = <2>;
+    };
+
+    pwm-fan1 {
+        compatible = "pwm-fan";
+        pinctrl-names = "default";
+        pinctrl-0 = <&pinctrl_fan1>;
+        pwms = <&lsio_pwm3 0 100000 PWM_POLARITY_INVERTED>;
+        interrupt-parent = <&lsio_gpio4>;
+        interrupts = <20 IRQ_TYPE_EDGE_FALLING>;
+        pulses-per-revolution = <2>;
+        cooling-levels = <0 50 100 150 200 255>;
+        #cooling-cells = <2>;
+    };
+
+    pwm-fan2 {
+        compatible = "pwm-fan";
+        pinctrl-names = "default";
+        pinctrl-0 = <&pinctrl_fan2>;
+        pwms = <&lsio_pwm0 0 100000 PWM_POLARITY_INVERTED>;
+        interrupt-parent = <&lsio_gpio4>;
+        interrupts = <21 IRQ_TYPE_EDGE_FALLING>;
+        pulses-per-revolution = <2>;
+        cooling-levels = <0 50 100 150 200 255>;
+        #cooling-cells = <2>;
+    };
+
+
+    // Voltage/current monitoring
+    // TODO update values
+
+    sys_24v_voltage: sys-24v-voltage {
+        #io-channel-cells = <0>;
+        compatible = "voltage-divider";
+        io-channels = <&adc0 0>;
+
+        output-ohms = <1>;
+        full-ohms = <1>;
+    };
+
+    sys_24v_current: sys-24v-current {
+        #io-channel-cells = <0>;
+        compatible = "current-sense-amplifier";
+        io-channels = <&adc0 1>;
+
+        sense-resistor-micro-ohms = <1>;
+        sense-gain-mult = <1>;
+    };
+
+    sys_aux24v_voltage: sys-aux24v-voltage {
+        #io-channel-cells = <0>;
+        compatible = "voltage-divider";
+        io-channels = <&adc0 2>;
+
+        output-ohms = <1>;
+        full-ohms = <1>;
+    };
+
+    sys_aux24v_current: sys-aux24v-current {
+        #io-channel-cells = <0>;
+        compatible = "current-sense-amplifier";
+        io-channels = <&adc0 3>;
+
+        sense-resistor-micro-ohms = <1>;
+        sense-gain-mult = <1>;
+    };
+
+    sys_5v_voltage: sys-5v-voltage {
+        #io-channel-cells = <0>;
+        compatible = "voltage-divider";
+        io-channels = <&adc1 0>;
+
+        output-ohms = <1>;
+        full-ohms = <1>;
+    };
+
+    sys_5v_current: sys-5v-current {
+        #io-channel-cells = <0>;
+        compatible = "current-sense-amplifier";
+        io-channels = <&adc1 1>;
+
+        sense-resistor-micro-ohms = <1>;
+        sense-gain-mult = <1>;
+    };
+
+    sys_3v3_voltage: sys-3v3-voltage {
+        #io-channel-cells = <0>;
+        compatible = "voltage-divider";
+        io-channels = <&adc1 2>;
+
+        output-ohms = <1>;
+        full-ohms = <1>;
+    };
+
+    sys_3v3_current: sys-3v3-current {
+        #io-channel-cells = <0>;
+        compatible = "current-sense-amplifier";
+        io-channels = <&adc1 3>;
+
+        sense-resistor-micro-ohms = <1>;
+        sense-gain-mult = <1>;
+    };
+
+    // Regulators
+
+	reg_3v3_vmmc: regulator-3v3-vmmc {
+		compatible = "regulator-fixed";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_enable_3v3_vmmc>;
+		/* MMC1_PWR_CTRL */
+		gpio = <&lsio_gpio5 19 GPIO_ACTIVE_HIGH>;
+		enable-active-high;
+		regulator-max-microvolt = <3300000>;
+		regulator-min-microvolt = <3300000>;
+		regulator-name = "3v3_vmmc";
+	};
+};
+
+&adc0 {
+	status = "okay";
+};
+
+&adc1 {
+	status = "okay";
+};
+
+/* Apalis ETH1 */
+&fec1 {
+	status = "okay";
+};
+
+/* Apalis I2C1 */
+&i2c2 {
+	/* M41T0M6 real time clock on carrier board */
+	rtc_i2c: rtc@68 {
+		status = "okay";
+	};
+
+    tc74a5: tc74a5@4d {
+        compatible = "tc74";
+        reg = <0x4d>;
+    };
+};
+
+/* Apalis UART3 */
+&lpuart0 {
+    status = "okay";
+};
+
+/* Apalis UART1 */
+&lpuart1 {
+    status = "okay";
+};
+
+/* Apalis PWM3, MXM3 pin 6 */
+&lsio_pwm0 {
+    status = "okay";
+};
+
+/* Apalis PWM1, MXM3 pin 2 */
+&lsio_pwm2 {
+    status = "okay";
+};
+
+/* Apalis PWM2, MXM3 pin 4 */
+&lsio_pwm3 {
+    status = "okay";
+};
+
+/* Apalis DAP1 */
+&sai1 {
+    status = "okay";
+};
+
+&sai5 {
+    status = "okay";
+};
+
+&sai5_lpcg {
+    status = "okay";
+};
+
+/* Apalis SATA1 */
+&sata {
+    status = "okay";
+};
+
+/* Apalis USBH4 SuperSpeed */
+&usbotg3_cdns3 {
+    status = "okay";
+};
+
+/* Apalis MMC1 */
+&usdhc2 {
+    pinctrl-0 = <&pinctrl_usdhc2_4bit>, <&pinctrl_mmc1_cd>;
+    pinctrl-1 = <&pinctrl_usdhc2_4bit_100mhz>, <&pinctrl_mmc1_cd>;
+    pinctrl-2 = <&pinctrl_usdhc2_4bit_200mhz>, <&pinctrl_mmc1_cd>;
+    pinctrl-3 = <&pinctrl_usdhc2_4bit_sleep>, <&pinctrl_mmc1_cd_sleep>;
+    bus-width = <4>;
+    cap-power-off-card;
+    /delete-property/ no-1-8-v;
+    vmmc-supply = <&reg_3v3_vmmc>;
+    status = "okay";
+    /delete-property/ cd-gpios;
+    non-removable;
+};
+
+&iomuxc {
+    pinctrl-0 = <&pinctrl_hog>;
+
+    pinctrl_hog: hoggrp {
+                // Debug GPIOs
+        fsl,pins = <IMX8QM_ENET1_RGMII_RXD3_LSIO_GPIO6_IO21	0x06000061>, /* DEBUG 0 */
+                <IMX8QM_ENET1_RGMII_RXD2_LSIO_GPIO6_IO20	0x06000061>, /* DEBUG 1 */
+                <IMX8QM_ENET1_RGMII_RXD1_LSIO_GPIO6_IO19	0x06000061>, /* DEBUG 2 */
+                <IMX8QM_ENET1_RGMII_RXD0_LSIO_GPIO6_IO18	0x06000061>, /* DEBUG 3 */
+                // Carrier config switches
+                <IMX8QM_ENET1_RGMII_TXD2_LSIO_GPIO6_IO14	0x06000061>, /* SWITCH 0 */
+                <IMX8QM_ENET1_RGMII_TXD1_LSIO_GPIO6_IO13	0x06000061>, /* SWITCH 1 */
+                <IMX8QM_ENET1_RGMII_TXD0_LSIO_GPIO6_IO12	0x06000061>, /* SWITCH 2 */
+                <IMX8QM_ENET1_RGMII_TXC_LSIO_GPIO6_IO10		0x06000061>, /* SWITCH 3 */
+                <IMX8QM_ENET1_RGMII_TX_CTL_LSIO_GPIO6_IO11	0x06000061>, /* SWITCH 4 */
+                <IMX8QM_ENET1_RGMII_RX_CTL_LSIO_GPIO6_IO17	0x06000061>; /* SWITCH 5 */
+    };
+
+	/* PMIC MMC1 power-switch */
+	pinctrl_enable_3v3_vmmc: enable3v3vmmcgrp {
+		fsl,pins = <IMX8QM_USDHC1_DATA4_LSIO_GPIO5_IO19		0x00000021>; /* MXM3_148, PMIC */
+	};
+
+    pinctrl_leds: ledsgrp {
+		fsl,pins = <IMX8QM_ESAI0_FSR_LSIO_GPIO2_IO22		0x06000061>, /* LED0 Green */
+                <IMX8QM_ESAI0_FST_LSIO_GPIO2_IO23			0x06000061>, /* LED1 Red */
+                <IMX8QM_SIM0_RST_LSIO_GPIO0_IO01			0x06000061>, /* LED3 Green */
+                <IMX8QM_SIM0_GPIO0_00_LSIO_GPIO0_IO05		0x06000061>, /* LED2 Red */
+                <IMX8QM_ESAI1_TX0_LSIO_GPIO2_IO08			0x06000061>; /* SATA activity Green */
+    };
+
+    pinctrl_buzzer: buzzergrp {
+        fsl,pins = <IMX8QM_LVDS0_I2C1_SCL_LSIO_GPIO1_IO08	0x06000061>;
+    };
+
+    pinctrl_fan0: fan0grp {
+        fsl,pins = <IMX8QM_QSPI1A_DQS_LSIO_GPIO4_IO22			0x06000021>;
+    };
+
+    pinctrl_fan1: fan1grp {
+        fsl,pins = <IMX8QM_QSPI1A_SS1_B_LSIO_GPIO4_IO20		0x06000021>;
+    };
+
+    pinctrl_fan2: fan2grp {
+        fsl,pins = <IMX8QM_QSPI1A_SCLK_LSIO_GPIO4_IO21			0x06000021>;
+    };
+
+    pinctrl_gpiobtns: gpiobtnsgrp {
+        fsl,pins = <IMX8QM_QSPI1A_DATA0_LSIO_GPIO4_IO26		0x06000021>, // REQ_PD#
+                <IMX8QM_USDHC2_DATA0_LSIO_GPIO5_IO26		0x06000021>; // FACTORY_DEFAULT#
+    };
+
+    pinctrl_gpiopwroff: gpiopwroffgrp {
+        fsl,pins = <IMX8QM_QSPI1A_DATA1_LSIO_GPIO4_IO25		0x06000021>; // PD_OK
+    };
+};
