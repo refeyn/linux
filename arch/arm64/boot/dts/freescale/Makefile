@@ -255,6 +255,7 @@ dtb-$(CONFIG_ARCH_MXC) += imx8qm-apalis-v1.1-eval.dtb
 dtb-$(CONFIG_ARCH_MXC) += imx8qm-apalis-v1.1-eval-v1.2.dtb
 dtb-$(CONFIG_ARCH_MXC) += imx8qm-apalis-v1.1-ixora-v1.1.dtb
 dtb-$(CONFIG_ARCH_MXC) += imx8qm-apalis-v1.1-ixora-v1.2.dtb
+dtb-$(CONFIG_ARCH_MXC) += imx8qm-apalis-v1.1-generic-carrier-generic-aux.dtb imx8qm-apalis-v1.1-tdx-ixora-13-generic-aux.dtb imx8qm-apalis-v1.1-ec-asm-00037-01-generic-aux.dtb imx8qm-apalis-v1.1-ec-asm-00037-01-ec-asm-00027-02.dtb
 dtb-$(CONFIG_ARCH_MXC) += imx8qp-apalis-v1.1-eval.dtb
 dtb-$(CONFIG_ARCH_MXC) += imx8qp-apalis-v1.1-eval-v1.2.dtb
 dtb-$(CONFIG_ARCH_MXC) += imx8qp-apalis-v1.1-ixora-v1.1.dtb
