@@ -249,7 +249,7 @@
 		status = "okay";
 	};
 
-    tc74a5: tc74a5@4d {
+    tc74a5: carrier-tc74a5@4d {
         compatible = "tc74";
         reg = <0x4d>;
     };

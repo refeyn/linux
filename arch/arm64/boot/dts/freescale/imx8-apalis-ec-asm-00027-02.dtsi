@@ -161,7 +161,7 @@
     clock-frequency = <100000>;
     status = "okay";
 
-    ads1015@48 {
+    aux-laser-mon-ads1015@48 {
         compatible = "ti,ads1015";
         reg = <0x48>;
         #address-cells = <1>;
@@ -233,8 +233,8 @@
     /* Apalis SPI1 */
     pinctrl_lpspi0cs: lpspi0grp {
         fsl,pins = <IMX8QM_SPI0_SCK_DMA_SPI0_SCK			0x0600004c>,
-                <IMX8QM_SPI0_SDO_DMA_SPI0_SDO			0x0600004c>,
-                <IMX8QM_SPI0_SDI_DMA_SPI0_SDI			0x0600004c>,
+                <IMX8QM_SPI0_SDO_DMA_SPI0_SDO				0x0600004c>,
+                <IMX8QM_SPI0_SDI_DMA_SPI0_SDI				0x0600004c>,
                 <IMX8QM_FLEXCAN2_TX_LSIO_GPIO4_IO02			0x0600004c>; // Not using CS0
     };
 };
