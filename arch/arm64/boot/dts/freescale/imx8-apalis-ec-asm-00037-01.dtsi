@@ -102,7 +102,7 @@
 
     // Fans
 
-   pwm-fan0 {
+    pwm-fan0 {
         compatible = "pwm-fan";
         pinctrl-names = "default";
         pinctrl-0 = <&pinctrl_fan0>;
@@ -216,17 +216,17 @@
 
     // Regulators
 
-	reg_3v3_vmmc: regulator-3v3-vmmc {
-		compatible = "regulator-fixed";
-		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_enable_3v3_vmmc>;
-		/* MMC1_PWR_CTRL */
-		gpio = <&lsio_gpio5 19 GPIO_ACTIVE_HIGH>;
-		enable-active-high;
-		regulator-max-microvolt = <3300000>;
-		regulator-min-microvolt = <3300000>;
-		regulator-name = "3v3_vmmc";
-	};
+    reg_3v3_vmmc: regulator-3v3-vmmc {
+        compatible = "regulator-fixed";
+        pinctrl-names = "default";
+        pinctrl-0 = <&pinctrl_enable_3v3_vmmc>;
+        /* MMC1_PWR_CTRL */
+        gpio = <&lsio_gpio5 19 GPIO_ACTIVE_HIGH>;
+        enable-active-high;
+        regulator-max-microvolt = <3300000>;
+        regulator-min-microvolt = <3300000>;
+        regulator-name = "3v3_vmmc";
+    };
 };
 
 &adc0 {
