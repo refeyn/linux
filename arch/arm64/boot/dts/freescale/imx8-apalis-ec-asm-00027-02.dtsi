@@ -6,13 +6,6 @@
 #include <dt-bindings/leds/common.h>
 #include "imx8-apalis-generic-aux.dtsi"
 
-/* Aux GPIOS
- * GPIO2_IO26 LED 0
- * GPIO2_IO28 touch int
- * GPIO0_IO13 (4) touch reset
- * GPIO3_IO26 (7) power enable
- */
-
 / {
 	aux-leds {
 		compatible = "gpio-leds";
@@ -45,6 +38,10 @@
         gpio = <&lsio_gpio3 26 GPIO_ACTIVE_HIGH>;
         enable-active-high;
         regulator-always-on;
+
+        regulator-state-mem {
+            regulator-off-in-suspend;
+        };
     };
 };
 
