@@ -214,6 +214,16 @@
         sense-gain-mult = <1>;
     };
 
+    // Backlight PWM
+
+    mipi_dsi1_backlight: mipi_backlight@1 {
+        compatible = "pwm-backlight";
+        pwms = <&pwm_mipi1 0 2000000 0>; // 500Hz
+        brightness-levels = <0 4 8 16 32 64 128 255>;
+        default-brightness-level = <6>;
+    };
+
+
     // Regulators
 
     reg_3v3_vmmc: regulator-3v3-vmmc {
@@ -252,6 +262,21 @@
     tc74a5: carrier-tc74a5@4d {
         compatible = "tc74";
         reg = <0x4d>;
+    };
+
+    touchscreen1: touchscreen@41 {
+        #address-cells = <1>;
+        #size-cells = <0>;
+        compatible = "ilitek,ili251x";
+        reg = <0x41>;
+
+        pinctrl-names = "default";
+        pinctrl-0 = <&pinctrl_mipi1_touchscreen>;
+
+        interrupt-parent = <&lsio_gpio2>;
+        interrupts = <28 IRQ_TYPE_LEVEL_LOW>; // TODO
+        reset-gpios = <&lsio_gpio0 13 GPIO_ACTIVE_LOW>; // AUX_GPIO_4
+        wakeup-source;
     };
 };
 
@@ -318,6 +343,61 @@
     non-removable;
 };
 
+
+// Backlight PWM
+
+&mipi1_subsys {
+    // Clocks for the MIPI DSI1 PWM subsystem
+    mipi1_pwm_lpcg_ipg_clk_highfreq: clock-controller@57223010 {
+        compatible = "fsl,imx8qxp-lpcg";
+        reg = <0x57223010 0x4>;
+        #clock-cells = <1>;
+        clocks = <&clk IMX_SC_R_MIPI_1_PWM_0 IMX_SC_PM_CLK_PER>;
+        bit-offset = <0>;
+        clock-output-names = "mipi1_pwm_lpcg_ipg_clk_highfreq";
+        power-domains = <&pd IMX_SC_R_MIPI_1_PWM_0>;
+    };
+
+    mipi1_pwm_lpcg_ipg_s_clk: clock-controller@5722300c {
+        compatible = "fsl,imx8qxp-lpcg";
+        reg = <0x5722300c 0x4>;
+        #clock-cells = <1>;
+        clocks = <&dsi_ipg_clk>;
+        bit-offset = <0>;
+        clock-output-names = "mipi1_pwm_lpcg_ipg_s_clk";
+        power-domains = <&pd IMX_SC_R_MIPI_1_PWM_0>;
+    };
+
+    mipi1_pwm_lpcg_ipg_clk: clock-controller@57223008 {
+        compatible = "fsl,imx8qxp-lpcg";
+        reg = <0x57223008 0x4>;
+        #clock-cells = <1>;
+        clocks = <&mipi1_pwm_lpcg_ipg_s_clk 0>;
+        bit-offset = <0>;
+        clock-output-names = "mipi1_pwm_lpcg_ipg_clk";
+        power-domains = <&pd IMX_SC_R_MIPI_1_PWM_0>;
+    };
+
+    // Actual PWM controller
+    pwm_mipi1: pwm@57224000 {
+        compatible = "fsl,imx8qm-pwm", "fsl,imx27-pwm";
+        reg = <0x57224000 0x1000>;
+        clocks = <&mipi1_pwm_lpcg_ipg_clk_highfreq 0>, <&mipi1_pwm_lpcg_ipg_clk 0>;
+        clock-names = "per", "ipg";
+        assigned-clocks = <&clk IMX_SC_R_MIPI_1_PWM_0 IMX_SC_PM_CLK_PER>;
+        assigned-clock-rates = <24000000>;
+        #pwm-cells = <2>;
+        power-domains = <&pd IMX_SC_R_MIPI_1_PWM_0>;
+        status = "disabled";
+    };
+};
+
+&pwm_mipi1 {
+    pinctrl-names = "default";
+    pinctrl-0 = <&pinctrl_pwm_mipi_dsi1>;
+    status = "okay";
+};
+
 &iomuxc {
     pinctrl-0 = <&pinctrl_hog>;
 
@@ -333,7 +413,9 @@
                 <IMX8QM_ENET1_RGMII_TXD0_LSIO_GPIO6_IO12	0x06000061>, /* SWITCH 2 */
                 <IMX8QM_ENET1_RGMII_TXC_LSIO_GPIO6_IO10		0x06000061>, /* SWITCH 3 */
                 <IMX8QM_ENET1_RGMII_TX_CTL_LSIO_GPIO6_IO11	0x06000061>, /* SWITCH 4 */
-                <IMX8QM_ENET1_RGMII_RX_CTL_LSIO_GPIO6_IO17	0x06000061>; /* SWITCH 5 */
+                <IMX8QM_ENET1_RGMII_RX_CTL_LSIO_GPIO6_IO17	0x06000061>, /* SWITCH 5 */
+                // Misc
+                <IMX8QM_FLEXCAN2_RX_LSIO_GPIO4_IO01			0x06000061>; /* Screen reset */
     };
 
 	/* PMIC MMC1 power-switch */
@@ -372,5 +454,14 @@
 
     pinctrl_gpiopwroff: gpiopwroffgrp {
         fsl,pins = <IMX8QM_QSPI1A_DATA1_LSIO_GPIO4_IO25		0x06000021>; // PD_OK
+    };
+
+    pinctrl_mipi1_touchscreen: mipi1_touchscreengrp {
+        fsl,pins = <IMX8QM_ESAI0_TX2_RX3_LSIO_GPIO2_IO28	0x04000020>,
+        <IMX8QM_M41_GPIO0_01_LSIO_GPIO0_IO13		0x04000020>;
+    };
+
+    pinctrl_pwm_mipi_dsi1: mipi1_pwmgrp {
+        fsl,pins = <IMX8QM_MIPI_DSI1_GPIO0_00_MIPI_DSI1_PWM0_OUT	0x06000020>;
     };
 };
