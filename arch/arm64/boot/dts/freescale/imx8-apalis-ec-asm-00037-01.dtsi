@@ -280,6 +280,15 @@
     };
 };
 
+&i2c4 {
+    pinctrl-names = "default";
+    pinctrl-0 = <&pinctrl_lpi2c4>;
+    #address-cells = <1>;
+    #size-cells = <0>;
+    clock-frequency = <100000>;
+    status = "okay";
+};
+
 /* Apalis UART3 */
 &lpuart0 {
     status = "okay";
@@ -454,6 +463,11 @@
 
     pinctrl_gpiopwroff: gpiopwroffgrp {
         fsl,pins = <IMX8QM_QSPI1A_DATA1_LSIO_GPIO4_IO25		0x06000021>; // PD_OK
+    };
+
+    pinctrl_lpi2c4: lpi2c4grp {
+        fsl,pins = <IMX8QM_ENET1_MDC_DMA_I2C4_SCL				0x04000020>,
+                <IMX8QM_ENET1_MDIO_DMA_I2C4_SDA			0x04000020>;
     };
 
     pinctrl_mipi1_touchscreen: mipi1_touchscreengrp {
