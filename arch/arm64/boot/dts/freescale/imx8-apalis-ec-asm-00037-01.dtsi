@@ -69,7 +69,7 @@
         gpios = <&lsio_gpio1 8 GPIO_ACTIVE_HIGH>;
     };
 
-    gpio-keys {
+    gpio_keys: gpio-keys {
         compatible = "gpio-keys";
         pinctrl-names = "default";
         pinctrl-0 = <&pinctrl_gpiobtns>;
@@ -336,22 +336,6 @@
 &usbotg3_cdns3 {
     status = "okay";
 };
-
-/* Apalis MMC1 */
-&usdhc2 {
-    pinctrl-0 = <&pinctrl_usdhc2_4bit>, <&pinctrl_mmc1_cd>;
-    pinctrl-1 = <&pinctrl_usdhc2_4bit_100mhz>, <&pinctrl_mmc1_cd>;
-    pinctrl-2 = <&pinctrl_usdhc2_4bit_200mhz>, <&pinctrl_mmc1_cd>;
-    pinctrl-3 = <&pinctrl_usdhc2_4bit_sleep>, <&pinctrl_mmc1_cd_sleep>;
-    bus-width = <4>;
-    cap-power-off-card;
-    /delete-property/ no-1-8-v;
-    vmmc-supply = <&reg_3v3_vmmc>;
-    status = "okay";
-    /delete-property/ cd-gpios;
-    non-removable;
-};
-
 
 // Backlight PWM
 

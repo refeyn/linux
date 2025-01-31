@@ -9,6 +9,8 @@
 &i2c0_lvds0 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_lpi2c0_lvds0>;
+	#address-cells = <1>;
+	#size-cells = <0>;
 	status = "okay";
 
 	aux_eeprom: aux-eeprom@50 {

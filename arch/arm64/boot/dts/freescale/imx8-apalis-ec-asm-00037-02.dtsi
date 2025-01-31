@@ -1,0 +1,53 @@
+// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
+/*
+ * Copyright 2025 Refeyn
+ */
+
+#include "imx8-apalis-ec-asm-00037-01.dtsi"
+
+/ {
+    reg_12v_aux: regulator-12v {
+        compatible = "regulator-fixed";
+        pinctrl-names = "default";
+        pinctrl-0 = <&pinctrl_12v_regulator>;
+        regulator-name = "reg_12v";
+        regulator-min-microvolt = <12000000>;
+        regulator-max-microvolt = <12000000>;
+        gpio = <&lsio_gpio2 29 GPIO_ACTIVE_HIGH>;
+        enable-active-high;
+        regulator-always-on;
+
+        regulator-state-mem {
+            regulator-off-in-suspend;
+        };
+    };
+};
+
+/* Apalis MMC1 */
+&usdhc2 {
+    pinctrl-0 = <&pinctrl_usdhc2_4bit>, <&pinctrl_mmc1_cd>;
+    pinctrl-1 = <&pinctrl_usdhc2_4bit_100mhz>, <&pinctrl_mmc1_cd>;
+    pinctrl-2 = <&pinctrl_usdhc2_4bit_200mhz>, <&pinctrl_mmc1_cd>;
+    pinctrl-3 = <&pinctrl_usdhc2_4bit_sleep>, <&pinctrl_mmc1_cd_sleep>;
+    bus-width = <4>;
+    cap-power-off-card;
+    /delete-property/ no-1-8-v;
+    vmmc-supply = <&reg_3v3_vmmc>;
+    status = "okay";
+};
+
+&gpio_keys {
+    /delete-node/ button-factory;
+};
+
+/* Apalis SATA1 */
+&sata {
+    status = "disabled";
+};
+
+&iomuxc {
+    pinctrl_12v_regulator: twelvevreggrp {
+        fsl,pins = <IMX8QM_ESAI0_TX3_RX2_LSIO_GPIO2_IO29			0x06000061>;
+    };
+};
+
