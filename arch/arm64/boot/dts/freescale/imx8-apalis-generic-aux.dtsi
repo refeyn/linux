@@ -5,6 +5,7 @@
 
 // Common aux functions
 
+// EEPROM may be on either interface :(
 /* Apalis I2C6 */
 &i2c0_lvds0 {
 	pinctrl-names = "default";
@@ -19,10 +20,28 @@
 	};
 };
 
+/* Apalis I2C8 */
+&i2c0_lvds1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_lpi2c0_lvds1>;
+	#address-cells = <1>;
+	#size-cells = <0>;
+	status = "okay";
+
+	aux_eeprom_alt: aux-eeprom@50 {
+		compatible = "atmel,24c256";
+		reg = <0x50>;
+	};
+};
+
 
 &iomuxc {
 	pinctrl_lpi2c0_lvds0: lpi2c0lvds0grp {
 		fsl,pins = <IMX8QM_LVDS0_I2C0_SCL_LVDS0_I2C0_SCL		0x04000020>,
 				<IMX8QM_LVDS0_I2C0_SDA_LVDS0_I2C0_SDA			0x04000020>;
+	};
+	pinctrl_lpi2c0_lvds1: lpi2c0lvds1grp {
+		fsl,pins = <IMX8QM_LVDS1_I2C0_SCL_LVDS1_I2C0_SCL		0x04000020>,
+				<IMX8QM_LVDS1_I2C0_SDA_LVDS1_I2C0_SDA			0x04000020>;
 	};
 };
