@@ -63,23 +63,21 @@
             function = LED_FUNCTION_INDICATOR;
             #address-cells = <1>;
             #size-cells = <0>;
+            default-state = "keep";
 
             led-red {
                 reg = <0>;
                 color = <LED_COLOR_ID_RED>;
-                default-state = "keep";
             };
 
             led-green {
                 reg = <1>;
                 color = <LED_COLOR_ID_GREEN>;
-                default-state = "keep";
             };
 
             led-blue {
                 reg = <2>;
                 color = <LED_COLOR_ID_BLUE>;
-                default-state = "keep";
             };
         };
     };
