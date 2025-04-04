@@ -166,7 +166,7 @@ static inline int lp5811_turn_off_auto(struct lp5811_priv *priv,
 	if (ret)
 		return ret;
 
-	return ret;
+	return 0;
 }
 
 static int lp5811_mc_brightness_set(struct led_classdev *lcdev,
