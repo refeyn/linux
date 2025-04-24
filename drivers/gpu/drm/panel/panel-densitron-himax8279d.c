@@ -1,4 +1,10 @@
 // SPDX-License-Identifier: GPL-2.0
+/*
+ * DSI panel driver for Densitron DMT101F3NMCMU-1A 1200x1920 display
+ * Based on the Boe Himax8279d driver
+ *
+ * Copyright 2025 Matthew Joyce <matthew.joyce@refeyn.com>
+ */
 
 #include <linux/delay.h>
 #include <linux/kernel.h>
@@ -69,12 +75,10 @@ static int send_mipi_cmds(struct drm_panel *panel, const struct panel_cmd *cmds)
 	return 0;
 }
 
-
 static int densitron_panel_disable(struct drm_panel *panel)
 {
 	struct panel_info *pinfo = to_panel_info(panel);
 	int err;
-	pr_alert("BOE DISABLE\n");
 
 	if (!pinfo->enabled)
 		return 0;
@@ -94,7 +98,6 @@ static int densitron_panel_unprepare(struct drm_panel *panel)
 {
 	struct panel_info *pinfo = to_panel_info(panel);
 	int err;
-	pr_alert("BOE UNPREPARE\n");
 
 	if (!pinfo->prepared)
 		return 0;
@@ -122,7 +125,6 @@ static int densitron_panel_prepare(struct drm_panel *panel)
 
 	if (pinfo->prepared)
 		return 0;
-	pr_alert("BOE PREPARE\n");
 
 	/* reset sequence */
 	/* T2: 14ms - 15ms */
@@ -161,7 +163,6 @@ static int densitron_panel_enable(struct drm_panel *panel)
 	}
 
 	usleep_range(5000, 6000);
-	pr_alert("BOE ENABLE\n");
 
 	/* send init code */
 	err = send_mipi_cmds(panel, pinfo->desc->on_cmds);
@@ -194,7 +195,7 @@ static int densitron_panel_enable(struct drm_panel *panel)
 }
 
 static int densitron_panel_get_modes(struct drm_panel *panel,
-			       struct drm_connector *connector)
+				     struct drm_connector *connector)
 {
 	struct panel_info *pinfo = to_panel_info(panel);
 	const struct drm_display_mode *m = pinfo->desc->display_mode;
@@ -207,14 +208,12 @@ static int densitron_panel_get_modes(struct drm_panel *panel,
 		return -ENOMEM;
 	}
 
-	pr_alert("BOE DISP MODE %u %d", mode->clock, (int) pinfo->orientation);
-
 	drm_mode_set_name(mode);
 
 	connector->display_info.width_mm = pinfo->desc->width_mm;
 	connector->display_info.height_mm = pinfo->desc->height_mm;
-    connector->display_info.bpc = pinfo->desc->bpc;
-    drm_mode_probed_add(connector, mode);
+	connector->display_info.bpc = pinfo->desc->bpc;
+	drm_mode_probed_add(connector, mode);
 
 	/*
 	 * TODO: Remove once all drm drivers call
@@ -225,7 +224,8 @@ static int densitron_panel_get_modes(struct drm_panel *panel,
 	return 1;
 }
 
-static enum drm_panel_orientation densitron_panel_get_orientation(struct drm_panel *panel)
+static enum drm_panel_orientation
+densitron_panel_get_orientation(struct drm_panel *panel)
 {
 	struct panel_info *pinfo = to_panel_info(panel);
 
@@ -242,30 +242,19 @@ static const struct drm_panel_funcs panel_funcs = {
 };
 
 static const struct drm_display_mode default_display_mode = {
-	// TODO put real timings in once we have a good signal path
-	// .clock = 40000,
-	// .hdisplay = 1200,
-	// .hsync_start = 1200 + 40,
-	// .hsync_end = 1200 + 40 + 10,
-	// .htotal = 1200 + 40 + 10 + 50,
-	// .vdisplay = 1920,
-	// .vsync_start = 1920 + 10,
-	// .vsync_end = 1920 + 10 + 10,
-	// .vtotal = 1920 + 10 + 10 + 20,
-
-
-	.clock = 28569,
-	.hdisplay = 800,
-	.hsync_start = 800 + 48,
-	.hsync_end = 800 + 48 + 32,
-	.htotal = 800 + 48 + 32 + 80,
-	.vdisplay = 480,
-	.vsync_start = 480 + 3,
-	.vsync_end = 480 + 3 + 7,
-	.vtotal = 480 + 3 + 7 + 6,
+	.clock = 152880,
+	.hdisplay = 1200,
+	.hsync_start = 1200 + 40,
+	.hsync_end = 1200 + 40 + 10,
+	.htotal = 1200 + 40 + 10 + 50,
+	.vdisplay = 1920,
+	.vsync_start = 1920 + 10,
+	.vsync_end = 1920 + 10 + 10,
+	.vtotal = 1920 + 10 + 10 + 20,
 };
 
 /* DMT101F3NMCMU-1A */
+// clang-format off
 static const struct panel_cmd densitron_dmt101f3nmcmu_1a_on_cmds[] = {
 	// PAGE 1 (OTP & GOA MUX)
 	{ 0xB0, 0x01 }, { 0xC3, 0x0F }, { 0xC4, 0x00 }, { 0xC5, 0x00 },
@@ -295,18 +284,19 @@ static const struct panel_cmd densitron_dmt101f3nmcmu_1a_on_cmds[] = {
 	{ 0xDB, 0x17 }, { 0xDC, 0x17 }, { 0xDD, 0x18 }, { 0xDE, 0x1A },
 	{ 0xDF, 0x1E }, { 0xE0, 0x20 }, { 0xE1, 0x23 }, { 0xE2, 0x07 },
 };
+// clang-format on
 
 static const struct panel_desc densitron_dmt101f3nmcmu_1a_panel_desc = {
 	.display_mode = &default_display_mode,
 	.bpc = 8,
 	.width_mm = 135,
-	.height_mm = 216,
+	.height_mm = 217,
 	.mode_flags = MIPI_DSI_MODE_VIDEO | MIPI_DSI_MODE_VIDEO_SYNC_PULSE |
-			MIPI_DSI_MODE_LPM,
+		      MIPI_DSI_CLOCK_NON_CONTINUOUS | MIPI_DSI_MODE_LPM,
 	.format = MIPI_DSI_FMT_RGB888,
 	.lanes = 4,
 	.on_cmds = densitron_dmt101f3nmcmu_1a_on_cmds,
-	.on_cmds_num = 89,
+	.on_cmds_num = ARRAY_SIZE(densitron_dmt101f3nmcmu_1a_on_cmds),
 };
 
 static const struct of_device_id panel_of_match[] = {
@@ -335,21 +325,19 @@ static int panel_add(struct panel_info *pinfo)
 
 	ret = of_drm_get_panel_orientation(dev->of_node, &pinfo->orientation);
 	if (ret) {
-		dev_err(dev, "%pOF: failed to get orientation %d\n", dev->of_node, ret);
+		dev_err(dev, "%pOF: failed to get orientation %d\n",
+			dev->of_node, ret);
 		return ret;
 	}
 	pinfo->orientation = DRM_MODE_PANEL_ORIENTATION_BOTTOM_UP;
 
-	pr_alert("BOE ADD\n");
-	drm_panel_init(&pinfo->base, dev, &panel_funcs,
-		       DRM_MODE_CONNECTOR_DSI);
+	drm_panel_init(&pinfo->base, dev, &panel_funcs, DRM_MODE_CONNECTOR_DSI);
 
 	ret = drm_panel_of_backlight(&pinfo->base);
 	if (ret)
 		return ret;
 
 	drm_panel_add(&pinfo->base);
-	pr_alert("BOE ADD END\n");
 
 	return 0;
 }
@@ -364,7 +352,6 @@ static int panel_probe(struct mipi_dsi_device *dsi)
 	if (!pinfo)
 		return -ENOMEM;
 
-	pr_alert("BOE PROBE\n");
 	desc = of_device_get_match_data(&dsi->dev);
 	dsi->mode_flags = desc->mode_flags;
 	dsi->format = desc->format;
@@ -376,16 +363,13 @@ static int panel_probe(struct mipi_dsi_device *dsi)
 
 	err = panel_add(pinfo);
 	if (err < 0) {
-		pr_alert("BOE PROBE: err in add %d\n", err);
 		return err;
 	}
 
 	err = mipi_dsi_attach(dsi);
 	if (err < 0) {
-		pr_alert("BOE PROBE: err in attach %d\n", err);
 		drm_panel_remove(&pinfo->base);
 	}
-	pr_alert("BOE PROBE END\n");
 
 	return err;
 }
