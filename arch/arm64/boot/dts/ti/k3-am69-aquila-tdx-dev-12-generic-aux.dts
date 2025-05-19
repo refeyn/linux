@@ -448,7 +448,7 @@
 
 // Touchscreen (well, the screen part)
 &{/} {
-	backlight_dsi1_lvds: backlight-dsi1-lvds {
+	backlight_dsi1: backlight-dsi1 {
 		compatible = "pwm-backlight";
 		pinctrl-names = "default";
 		pinctrl-0 = <&pinctrl_gpio_19_dsi_1>;
@@ -514,7 +514,7 @@
 
 		rotation = <90>;
 
-		backlight = <&backlight_dsi1_lvds>;
+		backlight = <&backlight_dsi1>;
 
 		pinctrl-names = "default";
 		pinctrl-0 = <&pinctrl_gpio_20_dsi_1>;
@@ -527,5 +527,27 @@
 				remote-endpoint = <&dsi0_out>;
 			};
 		};
+	};
+};
+
+&main_i2c0 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	status = "okay";
+
+	touchscreen1: touchscreen@41 {
+		#address-cells = <1>;
+		#size-cells = <0>;
+		compatible = "ilitek,ili251x";
+		reg = <0x41>;
+
+		// pinctrl-names = "default";
+		// pinctrl-0 = <&pinctrl_gpio_17_dsi_1>, <&pinctrl_gpio_18_dsi_1>;
+		// /* Aquila GPIO_17_DSI_1 (TOUCH_INT#, AQUILA B42) */
+		// interrupt-parent = <&main_gpio0>;
+		// interrupts = <12 IRQ_TYPE_EDGE_FALLING>;
+		// /* Aquila GPIO_18_DSI_1 (TOUCH_RESET#, AQUILA B43) */
+		// reset-gpios = <&main_gpio0 31 GPIO_ACTIVE_LOW>;
+		wakeup-source;
 	};
 };
