@@ -51,7 +51,7 @@
 
 struct mcp4131_cfg {
 	int wipers;
-	int max_pos;
+	int avail[3];
 	int kohms;
 };
 
@@ -91,38 +91,38 @@ enum mcp4131_type {
 };
 
 static const struct mcp4131_cfg mcp4131_cfg[] = {
-	[MCP413x_502] = { .wipers = 1, .max_pos = 128, .kohms =   5, },
-	[MCP413x_103] = { .wipers = 1, .max_pos = 128, .kohms =  10, },
-	[MCP413x_503] = { .wipers = 1, .max_pos = 128, .kohms =  50, },
-	[MCP413x_104] = { .wipers = 1, .max_pos = 128, .kohms = 100, },
-	[MCP414x_502] = { .wipers = 1, .max_pos = 128, .kohms =   5, },
-	[MCP414x_103] = { .wipers = 1, .max_pos = 128, .kohms =  10, },
-	[MCP414x_503] = { .wipers = 1, .max_pos = 128, .kohms =  50, },
-	[MCP414x_104] = { .wipers = 1, .max_pos = 128, .kohms = 100, },
-	[MCP415x_502] = { .wipers = 1, .max_pos = 256, .kohms =   5, },
-	[MCP415x_103] = { .wipers = 1, .max_pos = 256, .kohms =  10, },
-	[MCP415x_503] = { .wipers = 1, .max_pos = 256, .kohms =  50, },
-	[MCP415x_104] = { .wipers = 1, .max_pos = 256, .kohms = 100, },
-	[MCP416x_502] = { .wipers = 1, .max_pos = 256, .kohms =   5, },
-	[MCP416x_103] = { .wipers = 1, .max_pos = 256, .kohms =  10, },
-	[MCP416x_503] = { .wipers = 1, .max_pos = 256, .kohms =  50, },
-	[MCP416x_104] = { .wipers = 1, .max_pos = 256, .kohms = 100, },
-	[MCP423x_502] = { .wipers = 2, .max_pos = 128, .kohms =   5, },
-	[MCP423x_103] = { .wipers = 2, .max_pos = 128, .kohms =  10, },
-	[MCP423x_503] = { .wipers = 2, .max_pos = 128, .kohms =  50, },
-	[MCP423x_104] = { .wipers = 2, .max_pos = 128, .kohms = 100, },
-	[MCP424x_502] = { .wipers = 2, .max_pos = 128, .kohms =   5, },
-	[MCP424x_103] = { .wipers = 2, .max_pos = 128, .kohms =  10, },
-	[MCP424x_503] = { .wipers = 2, .max_pos = 128, .kohms =  50, },
-	[MCP424x_104] = { .wipers = 2, .max_pos = 128, .kohms = 100, },
-	[MCP425x_502] = { .wipers = 2, .max_pos = 256, .kohms =   5, },
-	[MCP425x_103] = { .wipers = 2, .max_pos = 256, .kohms =  10, },
-	[MCP425x_503] = { .wipers = 2, .max_pos = 256, .kohms =  50, },
-	[MCP425x_104] = { .wipers = 2, .max_pos = 256, .kohms = 100, },
-	[MCP426x_502] = { .wipers = 2, .max_pos = 256, .kohms =   5, },
-	[MCP426x_103] = { .wipers = 2, .max_pos = 256, .kohms =  10, },
-	[MCP426x_503] = { .wipers = 2, .max_pos = 256, .kohms =  50, },
-	[MCP426x_104] = { .wipers = 2, .max_pos = 256, .kohms = 100, },
+	[MCP413x_502] = { .wipers = 1, .avail = { 0, 1, 128 }, .kohms =   5, },
+	[MCP413x_103] = { .wipers = 1, .avail = { 0, 1, 128 }, .kohms =  10, },
+	[MCP413x_503] = { .wipers = 1, .avail = { 0, 1, 128 }, .kohms =  50, },
+	[MCP413x_104] = { .wipers = 1, .avail = { 0, 1, 128 }, .kohms = 100, },
+	[MCP414x_502] = { .wipers = 1, .avail = { 0, 1, 128 }, .kohms =   5, },
+	[MCP414x_103] = { .wipers = 1, .avail = { 0, 1, 128 }, .kohms =  10, },
+	[MCP414x_503] = { .wipers = 1, .avail = { 0, 1, 128 }, .kohms =  50, },
+	[MCP414x_104] = { .wipers = 1, .avail = { 0, 1, 128 }, .kohms = 100, },
+	[MCP415x_502] = { .wipers = 1, .avail = { 0, 1, 256 }, .kohms =   5, },
+	[MCP415x_103] = { .wipers = 1, .avail = { 0, 1, 256 }, .kohms =  10, },
+	[MCP415x_503] = { .wipers = 1, .avail = { 0, 1, 256 }, .kohms =  50, },
+	[MCP415x_104] = { .wipers = 1, .avail = { 0, 1, 256 }, .kohms = 100, },
+	[MCP416x_502] = { .wipers = 1, .avail = { 0, 1, 256 }, .kohms =   5, },
+	[MCP416x_103] = { .wipers = 1, .avail = { 0, 1, 256 }, .kohms =  10, },
+	[MCP416x_503] = { .wipers = 1, .avail = { 0, 1, 256 }, .kohms =  50, },
+	[MCP416x_104] = { .wipers = 1, .avail = { 0, 1, 256 }, .kohms = 100, },
+	[MCP423x_502] = { .wipers = 2, .avail = { 0, 1, 128 }, .kohms =   5, },
+	[MCP423x_103] = { .wipers = 2, .avail = { 0, 1, 128 }, .kohms =  10, },
+	[MCP423x_503] = { .wipers = 2, .avail = { 0, 1, 128 }, .kohms =  50, },
+	[MCP423x_104] = { .wipers = 2, .avail = { 0, 1, 128 }, .kohms = 100, },
+	[MCP424x_502] = { .wipers = 2, .avail = { 0, 1, 128 }, .kohms =   5, },
+	[MCP424x_103] = { .wipers = 2, .avail = { 0, 1, 128 }, .kohms =  10, },
+	[MCP424x_503] = { .wipers = 2, .avail = { 0, 1, 128 }, .kohms =  50, },
+	[MCP424x_104] = { .wipers = 2, .avail = { 0, 1, 128 }, .kohms = 100, },
+	[MCP425x_502] = { .wipers = 2, .avail = { 0, 1, 256 }, .kohms =   5, },
+	[MCP425x_103] = { .wipers = 2, .avail = { 0, 1, 256 }, .kohms =  10, },
+	[MCP425x_503] = { .wipers = 2, .avail = { 0, 1, 256 }, .kohms =  50, },
+	[MCP425x_104] = { .wipers = 2, .avail = { 0, 1, 256 }, .kohms = 100, },
+	[MCP426x_502] = { .wipers = 2, .avail = { 0, 1, 256 }, .kohms =   5, },
+	[MCP426x_103] = { .wipers = 2, .avail = { 0, 1, 256 }, .kohms =  10, },
+	[MCP426x_503] = { .wipers = 2, .avail = { 0, 1, 256 }, .kohms =  50, },
+	[MCP426x_104] = { .wipers = 2, .avail = { 0, 1, 256 }, .kohms = 100, },
 };
 
 struct mcp4131_data {
@@ -139,6 +139,7 @@ struct mcp4131_data {
 	.channel = (ch),					\
 	.info_mask_separate = BIT(IIO_CHAN_INFO_RAW),		\
 	.info_mask_shared_by_type = BIT(IIO_CHAN_INFO_SCALE),	\
+	.info_mask_shared_by_type_available = BIT(IIO_CHAN_INFO_RAW),	\
 }
 
 static const struct iio_chan_spec mcp4131_channels[] = {
@@ -195,8 +196,26 @@ static int mcp4131_read_raw(struct iio_dev *indio_dev,
 
 	case IIO_CHAN_INFO_SCALE:
 		*val = 1000 * data->cfg->kohms;
-		*val2 = data->cfg->max_pos;
+		*val2 = data->cfg->avail[2];
 		return IIO_VAL_FRACTIONAL;
+	}
+
+	return -EINVAL;
+}
+
+static int mcp4131_read_avail(struct iio_dev *indio_dev,
+							  struct iio_chan_spec const *chan,
+							  const int **vals, int *type, int *length,
+							  long mask)
+{
+	struct mcp4131_data *data = iio_priv(indio_dev);
+
+	switch (mask) {
+		case IIO_CHAN_INFO_RAW:
+			*length = ARRAY_SIZE(data->cfg->avail);
+			*vals = data->cfg->avail;
+			*type = IIO_VAL_INT;
+			return IIO_AVAIL_RANGE;
 	}
 
 	return -EINVAL;
@@ -212,7 +231,7 @@ static int mcp4131_write_raw(struct iio_dev *indio_dev,
 
 	switch (mask) {
 	case IIO_CHAN_INFO_RAW:
-		if (val > data->cfg->max_pos || val < 0)
+		if (val > data->cfg->avail[2] || val < 0)
 			return -EINVAL;
 		break;
 
@@ -234,6 +253,7 @@ static int mcp4131_write_raw(struct iio_dev *indio_dev,
 
 static const struct iio_info mcp4131_info = {
 	.read_raw = mcp4131_read_raw,
+	.read_avail = mcp4131_read_avail,
 	.write_raw = mcp4131_write_raw,
 };
 
