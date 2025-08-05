@@ -1,0 +1,17 @@
+// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
+/*
+ * Copyright 2024 Toradex
+ * Copyright 2025 Refeyn
+ *
+ * Device tree for generic carrier (just an EEPROM)
+ */
+
+/* Aquila I2C_2 */
+&mcu_i2c1 {
+	status = "okay";
+
+	carrier_eeprom: carrier-eeprom@50 {
+		compatible = "atmel,24c256";
+		reg = <0x50>;
+	};
+};

@@ -1,0 +1,136 @@
+// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
+/*
+ * Copyright 2024 Toradex
+ * Copyright 2025 Refeyn
+ *
+ * Device tree for EC-ASM-00048-01 CheckMate Screen Adaptor
+ */
+
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/interrupt-controller/irq.h>
+#include <dt-bindings/pwm/pwm.h>
+
+#include "k3-am69-aquila-generic-aux.dtsi"
+
+&wkup_pmx0 {
+	/* Aquila QSPI_1_CS2# (Touch reset) */
+	pinctrl_mcu_ospi0_cs1: mcu-ospi0-cs1-default-pins {
+		pinctrl-single,pins = <
+			J784S4_WKUP_IOPAD(0x030, PIN_OUTPUT, 7)  /* (A33) MCU_OSPI0_CSn1 */ /* AQUILA B62 */
+		>;
+	};
+};
+
+// BEGIN SCREEN
+
+&dss {
+	status = "okay";
+};
+
+/* Aquila PWM_3_DSI */
+&main_ehrpwm5 {
+	status = "okay";
+};
+
+// Touchscreen (well, the screen part)
+&{/} {
+	backlight_dsi1: backlight-dsi1 {
+		compatible = "pwm-backlight";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_gpio_19_dsi_1>;
+		brightness-levels = <0 45 63 88 119 158 203 255>;
+		default-brightness-level = <4>;
+		/* Aquila PWM_3_DSI (AQUILA B46) */
+		pwms = <&main_ehrpwm5 0 6666667 0>;
+	};
+};
+
+&dphy_tx0 {
+	status = "okay";
+};
+
+&dsi0 {
+	status = "okay";
+};
+
+&dsi0_ports {
+	#address-cells = <1>;
+	#size-cells = <0>;
+
+	port@0 {
+		reg = <0>;
+
+		dsi0_out: endpoint {
+			remote-endpoint = <&panel1_in>;
+		};
+	};
+
+	port@1 {
+		reg = <1>;
+
+		dsi0_in: endpoint {
+			remote-endpoint = <&dpi2_out>;
+		};
+	};
+};
+
+&dss_ports {
+	#address-cells = <1>;
+	#size-cells = <0>;
+
+	port@2 {
+		reg = <2>;
+
+		dpi2_out: endpoint {
+			remote-endpoint = <&dsi0_in>;
+		};
+	};
+};
+
+&dsi0 {
+	status = "okay";
+
+	panel@0 {
+		#address-cells = <1>;
+		#size-cells = <0>;
+		compatible = "densitron,dmt101f3nmcmu-1a";
+		reg = <0>;
+
+		rotation = <90>;
+
+		backlight = <&backlight_dsi1>;
+
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_gpio_17_dsi_1>;
+		/* Aquila GPIO_17_DSI_1 (AQUILA B43) */
+		reset-gpios = <&main_gpio0 31 GPIO_ACTIVE_HIGH>;
+
+		port@0 {
+			reg = <0>;
+			panel1_in: endpoint {
+				remote-endpoint = <&dsi0_out>;
+			};
+		};
+	};
+};
+
+/* Aquila I2C_3_DSI1 */
+&main_i2c0 {
+	status = "okay";
+
+	touchscreen1: touchscreen@41 {
+		compatible = "ilitek,ili251x";
+		reg = <0x41>;
+
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_mcu_ospi0_cs1>, <&pinctrl_eth2_int>;
+		/* Aquila QSPI_1_CS2# (TOUCH_INT#, AQUILA B62) */
+		interrupt-parent = <&wkup_gpio0>;
+		interrupts = <28 IRQ_TYPE_EDGE_FALLING>;
+		/* Aquila ETH_2_XGMII_INT# (TOUCH_RESET#, AQUILA B81) */
+		reset-gpios = <&main_gpio0 44 GPIO_ACTIVE_LOW>;
+		wakeup-source;
+	};
+};
+
+// END

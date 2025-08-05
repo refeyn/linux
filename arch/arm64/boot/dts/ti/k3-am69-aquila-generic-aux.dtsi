@@ -1,0 +1,17 @@
+// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
+/*
+ * Copyright 2024 Toradex
+ * Copyright 2025 Refeyn
+ *
+ * Device tree for generic aux (just an EEPROM)
+ */
+
+/* Aquila I2C_3_DSI1 */
+&main_i2c0 {
+	status = "okay";
+
+	display_eeprom: aux-eeprom@57 {
+		compatible = "atmel,24c256";
+		reg = <0x57>;
+	};
+};

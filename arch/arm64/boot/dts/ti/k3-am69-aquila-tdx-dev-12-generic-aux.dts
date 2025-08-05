@@ -506,11 +506,10 @@
 &dsi0 {
 	status = "okay";
 
-	panel@0 {
+	panel {
 		#address-cells = <1>;
 		#size-cells = <0>;
 		compatible = "densitron,dmt101f3nmcmu-1a";
-		reg = <0>;
 
 		rotation = <90>;
 
