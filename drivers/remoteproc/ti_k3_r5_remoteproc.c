@@ -495,10 +495,12 @@ static int k3_r5_suspend(struct rproc *rproc)
 	kproc->suspend_status = 0;
 	reinit_completion(&kproc->suspend_comp);
 
-	ret = mbox_send_message(kproc->mbox, (void *)msg);
-	if (ret < 0) {
-		dev_err(dev, "PM mbox_send_message failed: %d\n", ret);
-		return ret;
+	if (kproc->mbox) {
+		ret = mbox_send_message(kproc->mbox, (void *)msg);
+		if (ret < 0) {
+			dev_err(dev, "PM mbox_send_message failed: %d\n", ret);
+			return ret;
+		}
 	}
 
 	ret = wait_for_completion_timeout(&kproc->suspend_comp, to);
