@@ -40,7 +40,7 @@
 		vin-supply = <&reg_3v3_vio>;
 	};
 
-	/* Aquila ETH_2 MDIO (GPIO bit-banging) */
+	/* Aquila ETH_2_XGMII_MDIO (GPIO bit-banging) */
 	eth2_mdio_gpio: mdio {
 		compatible = "virtual,mdio-gpio";
 		pinctrl-names = "default";
@@ -75,7 +75,7 @@
 	status = "okay";
 };
 
-/* Aquila ETH_2 MDIO (V1.1) */
+/* Aquila ETH_2_XGMII_MDIO (V1.1) */
 &main_cpsw0_mdio {
 	status = "disabled";
 };
@@ -194,14 +194,14 @@
 	};
 
 
-	/* Aquila ETH_2_MDIO as GPIO */
+	/* Aquila ETH_2_XGMII_MDIO as GPIO */
 	pinctrl_eth2_mdio: main-gpio0-47-default-pins {
 		pinctrl-single,pins = <
 			J784S4_IOPAD(0x0bc, PIN_INPUT, 7)  /* (AD33) MCASP1_AFSX.GPIO0_47 */ /* AQUILA B89 */
 		>;
 	};
 
-	/* Aquila ETH_2_MDC as GPIO */
+	/* Aquila ETH_2_XGMII_MDC as GPIO */
 	pinctrl_eth2_mdc: main-gpio0-48-default-pins {
 		pinctrl-single,pins = <
 			J784S4_IOPAD(0x0c0, PIN_INPUT, 7) /* (AD38) MCASP1_AXR0.GPIO0_48 */ /* AQUILA B90 */

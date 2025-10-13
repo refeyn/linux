@@ -578,7 +578,7 @@
 		>;
 	};
 
-	/* Aquila ETH_2 MDIO */
+	/* Aquila ETH_2_XGMII_MDIO */
 	pinctrl_main_mdio1: main-mdio1-default-pins {
 		pinctrl-single,pins = <
 			J784S4_IOPAD(0x058, PIN_OUTPUT, 4) /* (AE37) MCASP2_AFSX.MDIO1_MDC  */ /* AQUILA B90 */
@@ -1192,7 +1192,7 @@
 	status = "disabled";
 };
 
-/* Aquila ETH_2 MDIO */
+/* Aquila ETH_2_XGMII_MDIO */
 &main_cpsw0_mdio {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_main_mdio1>;
