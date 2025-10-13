@@ -726,7 +726,10 @@ static int k3_m4_suspend(struct rproc *rproc)
 	unsigned long to = msecs_to_jiffies(5000);
 	struct dev_pm_qos_request qos_req;
 	struct device *dev = kproc->dev;
-	int ret;
+	int ret = 0;
+
+	if (rproc->state != RPROC_RUNNING)
+		return ret;
 
 	kproc->suspend_status = 0;
 	reinit_completion(&kproc->suspend_comp);
