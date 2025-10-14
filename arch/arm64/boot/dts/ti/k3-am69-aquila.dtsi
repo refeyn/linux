@@ -272,8 +272,6 @@
 		pinctrl-0 = <&pinctrl_en_3v3_wifi>;
 		enable-active-high;
 		gpio = <&wkup_gpio0 57 GPIO_ACTIVE_HIGH>;
-		regulator-always-on;
-		regulator-boot-on;
 		regulator-max-microvolt = <3300000>;
 		regulator-min-microvolt = <3300000>;
 		regulator-name = "+V3.3_WIFI";
@@ -1695,6 +1693,7 @@
 	phy-names = "pcie-phy";
 	phys = <&serdes0_pcie3_1l_link>;
 	reset-gpios = <&som_gpio_expander 4 GPIO_ACTIVE_HIGH>;
+	vpcie3v3-supply = <&reg_3v3_wifi>;
 	ti,syscon-acspcie-proxy-ctrl = <&acspcie0_proxy_ctrl 0x3>;
 	status = "okay";
 };
