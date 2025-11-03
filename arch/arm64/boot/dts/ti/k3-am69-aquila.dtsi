@@ -37,7 +37,7 @@
 		mmc0 = &main_sdhci0;
 		mmc1 = &main_sdhci1;
 		rtc0 = &rtc_i2c;
-		serial0 = &main_uart1;
+		serial0 = &main_uart4;
 		serial1 = &wkup_uart0;
 		serial2 = &main_uart8;
 		serial3 = &mcu_uart0;
