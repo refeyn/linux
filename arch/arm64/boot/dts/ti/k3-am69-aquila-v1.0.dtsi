@@ -15,6 +15,7 @@
 	aliases {
 		ethernet1 = &main_cpsw0_port2;
 		mdio-gpio0 = &eth2_mdio_gpio;
+		serial0 = &main_uart1;
 	};
 
 	reg_3v3_dp: regulator-3v3-dp {
