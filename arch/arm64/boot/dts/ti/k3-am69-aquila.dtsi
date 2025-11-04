@@ -78,7 +78,7 @@
 		compatible = "gpio-restart";
 		/* COLD_RESET_REQ */
 		gpios = <&som_gpio_expander 1 GPIO_ACTIVE_HIGH>;
-		priority = <128>;
+		priority = <192>;
 	};
 
 	/* PWR_DOWN_REQ */
