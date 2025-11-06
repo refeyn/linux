@@ -131,20 +131,19 @@
 		#size-cells = <0>;
 		#pwm-cells = <3>;
 
-		cpu_fan: cpu-fan@0 {
+		case_fan0: case-fan-0@0 {
 			reg = <0x0>;
 			pwms = <&fan_controller 26000 0 1>;
 			#cooling-cells = <2>;
-			cooling-levels = <102 179 255>;
 		};
 
-		fan@1 {
+		case_fan1: case-fan-1@1 {
 			reg = <0x1>;
 			pwms = <&fan_controller 26000 0 1>;
 			#cooling-cells = <2>;
 		};
 
-		fan@2 {
+		cpu_fan: cpu-fan@2 {
 			reg = <0x2>;
 			pwms = <&fan_controller 26000 0 1>;
 			#cooling-cells = <2>;
@@ -340,15 +339,71 @@
 
 // BEGIN THERMAL
 
+&main0_alert0 {
+	temperature = <40000>;
+};
+
+&main1_alert0 {
+	temperature = <40000>;
+};
+
+&main2_alert0 {
+	temperature = <40000>;
+};
+
+&main3_alert0 {
+	temperature = <40000>;
+};
+
+&main4_alert0 {
+	temperature = <40000>;
+};
+
+&wkup0_alert0 {
+	temperature = <40000>;
+};
+
+&wkup1_alert0 {
+	temperature = <40000>;
+};
+
+&main0_alert1 {
+	type = "hot";
+};
+
+&main1_alert1 {
+	type = "hot";
+};
+
+&main2_alert1 {
+	type = "hot";
+};
+
+&main3_alert1 {
+	type = "hot";
+};
+
+&main4_alert1 {
+	type = "hot";
+};
+
+&wkup0_alert1 {
+	type = "hot";
+};
+
+&wkup1_alert1 {
+	type = "hot";
+};
+
 &main0_thermal {
 	cooling-maps {
 		map0 {
-			cooling-device = <&cpu_fan 1 1>;
+			cooling-device = <&cpu_fan 1 5>;
 			trip = <&main0_alert0>;
 		};
 
 		map1 {
-			cooling-device = <&cpu_fan 2 2>;
+			cooling-device = <&cpu_fan 6 THERMAL_NO_LIMIT>;
 			trip = <&main0_alert1>;
 		};
 	};
@@ -357,12 +412,12 @@
 &main1_thermal {
 	cooling-maps {
 		map0 {
-			cooling-device = <&cpu_fan 1 1>;
+			cooling-device = <&cpu_fan 1 5>;
 			trip = <&main1_alert0>;
 		};
 
 		map1 {
-			cooling-device = <&cpu_fan 2 2>;
+			cooling-device = <&cpu_fan 6 THERMAL_NO_LIMIT>;
 			trip = <&main1_alert1>;
 		};
 	};
@@ -371,12 +426,12 @@
 &main2_thermal {
 	cooling-maps {
 		map0 {
-			cooling-device = <&cpu_fan 1 1>;
+			cooling-device = <&cpu_fan 1 5>;
 			trip = <&main2_alert0>;
 		};
 
 		map1 {
-			cooling-device = <&cpu_fan 2 2>;
+			cooling-device = <&cpu_fan 6 THERMAL_NO_LIMIT>;
 			trip = <&main2_alert1>;
 		};
 	};
@@ -385,12 +440,12 @@
 &main3_thermal {
 	cooling-maps {
 		map0 {
-			cooling-device = <&cpu_fan 1 1>;
+			cooling-device = <&cpu_fan 1 5>;
 			trip = <&main3_alert0>;
 		};
 
 		map1 {
-			cooling-device = <&cpu_fan 2 2>;
+			cooling-device = <&cpu_fan 6 THERMAL_NO_LIMIT>;
 			trip = <&main3_alert1>;
 		};
 	};
@@ -399,12 +454,12 @@
 &main4_thermal {
 	cooling-maps {
 		map0 {
-			cooling-device = <&cpu_fan 1 1>;
+			cooling-device = <&cpu_fan 1 5>;
 			trip = <&main4_alert0>;
 		};
 
 		map1 {
-			cooling-device = <&cpu_fan 2 2>;
+			cooling-device = <&cpu_fan 6 THERMAL_NO_LIMIT>;
 			trip = <&main4_alert1>;
 		};
 	};
@@ -413,12 +468,12 @@
 &wkup0_thermal {
 	cooling-maps {
 		map0 {
-			cooling-device = <&cpu_fan 1 1>;
+			cooling-device = <&cpu_fan 1 5>;
 			trip = <&wkup0_alert0>;
 		};
 
 		map1 {
-			cooling-device = <&cpu_fan 2 2>;
+			cooling-device = <&cpu_fan 6 THERMAL_NO_LIMIT>;
 			trip = <&wkup0_alert1>;
 		};
 	};
@@ -427,12 +482,12 @@
 &wkup1_thermal {
 	cooling-maps {
 		map0 {
-			cooling-device = <&cpu_fan 1 1>;
+			cooling-device = <&cpu_fan 1 5>;
 			trip = <&wkup1_alert0>;
 		};
 
 		map1 {
-			cooling-device = <&cpu_fan 2 2>;
+			cooling-device = <&cpu_fan 6 THERMAL_NO_LIMIT>;
 			trip = <&wkup1_alert1>;
 		};
 	};
