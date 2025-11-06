@@ -101,8 +101,8 @@
 		backlight = <&backlight_dsi1>;
 
 		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_gpio_17_dsi_1>;
-		/* Aquila GPIO_17_DSI_1 (AQUILA B43) */
+		pinctrl-0 = <&pinctrl_gpio_18_dsi_1>;
+		/* Aquila GPIO_18_DSI_1 (AQUILA B43) */
 		reset-gpios = <&main_gpio0 31 GPIO_ACTIVE_HIGH>;
 
 		port@0 {
