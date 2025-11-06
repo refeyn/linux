@@ -1,0 +1,14 @@
+// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
+/*
+ * Copyright (C) 2025 Toradex
+ * Copyright 2025 Refeyn
+ *
+ * Device tree for EC-ASM-00044-01 CheckMate Main Board with EC-ASM-00048-01 CheckMate Screen Adaptor
+ */
+
+#include "k3-am69-aquila-v1.1-tdx-dev-12-generic-aux.dts"
+#include "k3-am69-aquila-v1.0.dtsi"
+
+/ {
+	model = "Toradex Aquila AM69 v1.0 on Aquila Development Board (with no aux board)";
+};

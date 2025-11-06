@@ -144,11 +144,33 @@
 &main_i2c5 {
 	status = "okay";
 
-	fan@4d {
-		compatible = "emc2303";
-		reg = <0x4D>;
+	fan_controller: fan-controller@4d {
 		pinctrl-names = "default";
 		pinctrl-0 = <&pinctrl_mcu_mcan1_gpio>; // FAN_ALERT
+		compatible = "microchip,emc2305";
+		reg = <0x4D>;
+		#address-cells = <1>;
+		#size-cells = <0>;
+		#pwm-cells = <3>;
+
+		cpu_fan: cpu-fan@0 {
+			reg = <0x0>;
+			pwms = <&fan_controller 26000 0 1>;
+			#cooling-cells = <2>;
+			cooling-levels = <102 179 255>;
+		};
+
+		fan@1 {
+			reg = <0x1>;
+			pwms = <&fan_controller 26000 0 1>;
+			#cooling-cells = <2>;
+		};
+
+		fan@2 {
+			reg = <0x2>;
+			pwms = <&fan_controller 26000 0 1>;
+			#cooling-cells = <2>;
+		};
 	};
 
 	// External temperature sensor boards
@@ -296,11 +318,11 @@
 // BEGIN RT CPU CONTROL
 
 /* Aquila UART_1 */
-&main_uart1 {
+&main_uart4 {
 	status = "okay";
 	pinctrl-0 =
 		// UART
-		<&pinctrl_main_uart1>,
+		<&pinctrl_main_uart4>,
 		// GPIOs
 		<&pinctrl_gpio_04>, // RTCPU_RESET
 		<&pinctrl_gpio_05>, // RTCPU_MODE_0
@@ -338,7 +360,103 @@
 
 // BEGIN THERMAL
 
-// TODO
+&main0_thermal {
+	cooling-maps {
+		map0 {
+			cooling-device = <&cpu_fan 1 1>;
+			trip = <&main0_alert0>;
+		};
+
+		map1 {
+			cooling-device = <&cpu_fan 2 2>;
+			trip = <&main0_alert1>;
+		};
+	};
+};
+
+&main1_thermal {
+	cooling-maps {
+		map0 {
+			cooling-device = <&cpu_fan 1 1>;
+			trip = <&main1_alert0>;
+		};
+
+		map1 {
+			cooling-device = <&cpu_fan 2 2>;
+			trip = <&main1_alert1>;
+		};
+	};
+};
+
+&main2_thermal {
+	cooling-maps {
+		map0 {
+			cooling-device = <&cpu_fan 1 1>;
+			trip = <&main2_alert0>;
+		};
+
+		map1 {
+			cooling-device = <&cpu_fan 2 2>;
+			trip = <&main2_alert1>;
+		};
+	};
+};
+
+&main3_thermal {
+	cooling-maps {
+		map0 {
+			cooling-device = <&cpu_fan 1 1>;
+			trip = <&main3_alert0>;
+		};
+
+		map1 {
+			cooling-device = <&cpu_fan 2 2>;
+			trip = <&main3_alert1>;
+		};
+	};
+};
+
+&main4_thermal {
+	cooling-maps {
+		map0 {
+			cooling-device = <&cpu_fan 1 1>;
+			trip = <&main4_alert0>;
+		};
+
+		map1 {
+			cooling-device = <&cpu_fan 2 2>;
+			trip = <&main4_alert1>;
+		};
+	};
+};
+
+&wkup0_thermal {
+	cooling-maps {
+		map0 {
+			cooling-device = <&cpu_fan 1 1>;
+			trip = <&wkup0_alert0>;
+		};
+
+		map1 {
+			cooling-device = <&cpu_fan 2 2>;
+			trip = <&wkup0_alert1>;
+		};
+	};
+};
+
+&wkup1_thermal {
+	cooling-maps {
+		map0 {
+			cooling-device = <&cpu_fan 1 1>;
+			trip = <&wkup1_alert0>;
+		};
+
+		map1 {
+			cooling-device = <&cpu_fan 2 2>;
+			trip = <&wkup1_alert1>;
+		};
+	};
+};
 
 // END
 

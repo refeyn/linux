@@ -19,7 +19,7 @@
 
 
 / {
-	model = "Toradex Aquila AM69 on Aquila Development Board (with no aux board)";
+	model = "Toradex Aquila AM69 v1.1 on Aquila Development Board (with no aux board)";
 	compatible = "toradex,aquila-am69-tdx-dev-generic-aux",
 		     "toradex,aquila-am69",
 		     "ti,j784s4";
@@ -74,12 +74,13 @@
 			"IN2L", "Line In Jack",
 			"IN2R", "Line In Jack",
 			"Microphone Jack", "MICBIAS",
-			"IN1L", "Microphone Jack";
+			"IN1L", "Microphone Jack",
+			"IN1R", "Digital Mic";
 		simple-audio-card,widgets =
 			"Microphone", "Microphone Jack",
+			"Microphone", "Digital Mic",
 			"Headphone", "Headphone Jack",
 			"Line", "Line In Jack";
-
 
 		codec_dai: simple-audio-card,codec {
 			sound-dai = <&wm8904_1a>;
@@ -119,22 +120,92 @@
 	status = "okay";
 };
 
+&main0_thermal {
+	cooling-maps {
+		map0 {
+			cooling-device = <&fan 1 1>;
+			trip = <&main0_alert0>;
+		};
+
+		map1 {
+			cooling-device = <&fan 2 2>;
+			trip = <&main0_alert1>;
+		};
+	};
+};
+
+&main1_thermal {
+	cooling-maps {
+		map0 {
+			cooling-device = <&fan 1 1>;
+			trip = <&main1_alert0>;
+		};
+
+		map1 {
+			cooling-device = <&fan 2 2>;
+			trip = <&main1_alert1>;
+		};
+	};
+};
+
+&main2_thermal {
+	cooling-maps {
+		map0 {
+			cooling-device = <&fan 1 1>;
+			trip = <&main2_alert0>;
+		};
+
+		map1 {
+			cooling-device = <&fan 2 2>;
+			trip = <&main2_alert1>;
+		};
+	};
+};
+
+&main3_thermal {
+	cooling-maps {
+		map0 {
+			cooling-device = <&fan 1 1>;
+			trip = <&main3_alert0>;
+		};
+
+		map1 {
+			cooling-device = <&fan 2 2>;
+			trip = <&main3_alert1>;
+		};
+	};
+};
+
+&main4_thermal {
+	cooling-maps {
+		map0 {
+			cooling-device = <&fan 1 1>;
+			trip = <&main4_alert0>;
+		};
+
+		map1 {
+			cooling-device = <&fan 2 2>;
+			trip = <&main4_alert1>;
+		};
+	};
+};
+
 /* Aquila ETH_2 */
 &main_cpsw0 {
 	status = "okay";
 };
 
 /* Aquila ETH_2 SGMII PHY */
-&main_cpsw0_port2 {
-	phy-handle = <&cpsw0_port2_phy4>;
+&main_cpsw0_port8 {
+	phy-handle = <&cpsw0_port8_phy4>;
 	status = "okay";
 };
 
 /* Aquila ETH_2 MDIO */
-&eth2_mdio_gpio {
+&main_cpsw0_mdio {
 	status = "okay";
 
-	cpsw0_port2_phy4: ethernet-phy@4 {
+	cpsw0_port8_phy4: ethernet-phy@4 {
 		reg = <4>;
 		pinctrl-names = "default";
 		pinctrl-0 = <&pinctrl_eth2_int>;
@@ -154,7 +225,7 @@
 };
 
 /* Aquila PWM_2 */
-&main_ehrpwm3 {
+&main_ehrpwm1 {
 	status = "okay";
 };
 
@@ -182,6 +253,27 @@
 /* Aquila I2C_3_DSI1 */
 &main_i2c0 {
 	status = "okay";
+
+	i2c-mux@70 {
+		compatible = "nxp,pca9543";
+		reg = <0x70>;
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		/* I2C on DSI Connector Pin #4 and #6 */
+		i2c_dsi_0: i2c@0 {
+			reg = <0>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+		};
+
+		/* I2C on DSI Connector Pin #52 and #54 */
+		i2c_dsi_1: i2c@1 {
+			reg = <1>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+		};
+	};
 };
 
 /* Aquila I2C_4_CSI1 */
@@ -225,7 +317,7 @@
 };
 
 /* Aquila UART_1 */
-&main_uart1 {
+&main_uart4 {
 	status = "okay";
 };
 
@@ -254,9 +346,16 @@
 	status = "okay";
 
 	/* Fan controller */
-	fan@18 {
+	fan_controller: fan@18 {
 		compatible = "ti,amc6821";
 		reg = <0x18>;
+		#pwm-cells = <2>;
+
+		fan: fan {
+			cooling-levels = <102 179 255>;
+			#cooling-cells = <2>;
+			pwms = <&fan_controller 40000 PWM_POLARITY_INVERTED>;
+		};
 	};
 
 	/* Audio Codec */
@@ -273,6 +372,20 @@
 		DBVDD-supply = <&reg_1v8_sw>;
 		DCVDD-supply = <&reg_1v8_sw>;
 		MICVDD-supply = <&reg_1v8_sw>;
+
+		wlf,drc-cfg-names = "default", "peaklimiter";
+		/*
+		 * Config registers per name, respectively:
+		 * KNEE_IP = 0,   KNEE_OP = 0,     HI_COMP = 1,   LO_COMP = 1
+		 * KNEE_IP = -24, KNEE_OP = -6,    HI_COMP = 1/4, LO_COMP = 1
+		 */
+		wlf,drc-cfg-regs = /bits/ 16 <0x01af 0x3248 0x0000 0x0000>,
+				   /bits/ 16 <0x04af 0x324b 0x0010 0x0408>;
+
+		/* GPIO1 = DMIC_CLK, don't touch others */
+		wlf,gpio-cfg = <0x0018>, <0xffff>, <0xffff>, <0xffff>;
+
+		wlf,in1r-as-dmicdat2;
 	};
 
 	/* Current measurement into module VCC */
@@ -393,7 +506,15 @@
 	status = "okay";
 };
 
+&serdes2 {
+	status = "okay";
+};
+
 &serdes4 {
+	status = "okay";
+};
+
+&serdes_wiz2 {
 	status = "okay";
 };
 
@@ -426,6 +547,34 @@
 	port {
 		usb0_hs: endpoint {
 			remote-endpoint = <&usb_1_con_hs>;
+		};
+	};
+};
+
+&wkup0_thermal {
+	cooling-maps {
+		map0 {
+			cooling-device = <&fan 1 1>;
+			trip = <&wkup0_alert0>;
+		};
+
+		map1 {
+			cooling-device = <&fan 2 2>;
+			trip = <&wkup0_alert1>;
+		};
+	};
+};
+
+&wkup1_thermal {
+	cooling-maps {
+		map0 {
+			cooling-device = <&fan 1 1>;
+			trip = <&wkup1_alert0>;
+		};
+
+		map1 {
+			cooling-device = <&fan 2 2>;
+			trip = <&wkup1_alert1>;
 		};
 	};
 };

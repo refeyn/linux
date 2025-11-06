@@ -13,7 +13,7 @@
 #include "k3-am69-aquila-ec-asm-00048-01.dtsi"
 
 / {
-	model = "Toradex Aquila AM69 on EC-ASM-00044-01 CheckMate Main Board with EC-ASM-00048-01 CheckMate Screen Adaptor";
+	model = "Toradex Aquila AM69 v1.1 on EC-ASM-00044-01 CheckMate Main Board (with no aux board)";
 	compatible = "toradex,aquila-am69-ec-asm-00044-01-ec-asm-00048-01",
 		     "toradex,aquila-am69",
 		     "ti,j784s4";

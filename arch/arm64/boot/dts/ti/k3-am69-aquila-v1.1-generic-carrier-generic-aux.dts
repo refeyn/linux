@@ -13,7 +13,7 @@
 #include "k3-am69-aquila-generic-aux.dtsi"
 
 / {
-	model = "Toradex Aquila AM69 on generic carrier";
+	model = "Toradex Aquila AM69 v1.1 on generic carrier";
 	compatible = "toradex,aquila-am69-generic-carrier-generic-aux",
 		     "toradex,aquila-am69",
 		     "ti,j784s4";

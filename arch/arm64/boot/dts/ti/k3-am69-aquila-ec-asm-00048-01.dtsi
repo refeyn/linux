@@ -13,10 +13,10 @@
 #include "k3-am69-aquila-generic-aux.dtsi"
 
 &wkup_pmx0 {
-	/* Aquila QSPI_1_CS2# (Touch reset) */
-	pinctrl_mcu_ospi0_cs1: mcu-ospi0-cs1-default-pins {
+	/* Aquila QSPI_1_CS2# (Touch interrupt) */
+	pinctrl_mcu_ospi0_cs1_gpio: mcu-ospi0-cs1-default-pins {
 		pinctrl-single,pins = <
-			J784S4_WKUP_IOPAD(0x030, PIN_OUTPUT, 7)  /* (A33) MCU_OSPI0_CSn1 */ /* AQUILA B62 */
+			J784S4_WKUP_IOPAD(0x030, PIN_INPUT, 7)  /* (A33) MCU_OSPI0_CSn1 */ /* AQUILA B62 */
 		>;
 	};
 };
@@ -123,7 +123,7 @@
 		reg = <0x41>;
 
 		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_mcu_ospi0_cs1>, <&pinctrl_eth2_int>;
+		pinctrl-0 = <&pinctrl_mcu_ospi0_cs1_gpio>, <&pinctrl_eth2_int>;
 		/* Aquila QSPI_1_CS2# (TOUCH_INT#, AQUILA B62) */
 		interrupt-parent = <&wkup_gpio0>;
 		interrupts = <28 IRQ_TYPE_EDGE_FALLING>;
