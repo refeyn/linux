@@ -672,7 +672,7 @@ static int emc2305_probe(struct i2c_client *client)
 		}
 	} else {
 		data->max_state = EMC2305_FAN_MAX_STATE;
-		data->pwm_separate = false;
+		data->pwm_separate = true;
 		for (i = 0; i < EMC2305_PWM_MAX; i++)
 			data->pwm_min[i] = EMC2305_FAN_MIN;
 	}
@@ -687,7 +687,7 @@ static int emc2305_probe(struct i2c_client *client)
 		if (pwm_childs > 0) {
 			i = 0;
 			for_each_child_of_node(dev->of_node, child) {
-				ret = emc2305_set_single_tz(dev, child, i);
+				ret = emc2305_set_single_tz(dev, child, i + 1);
 				if (ret != 0)
 					return ret;
 				i++;
