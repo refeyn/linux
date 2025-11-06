@@ -3,7 +3,7 @@
  * Copyright 2024 Toradex
  * Copyright 2025 Refeyn
  *
- * Device tree for EC-ASM-00044-01 CheckMate Main Board
+ * Device tree for EC-ASM-00044-02 CheckMate Main Board
  */
 
 #include <dt-bindings/gpio/gpio.h>
@@ -13,13 +13,6 @@
 #include "k3-am69-aquila-generic-carrier.dtsi"
 
 &main_pmx0 {
-	/* Aquila SPI_1 CS */
-	pinctrl_main_spi2_cs0_gpio: main-spi2-cs0-gpio-pins {
-		pinctrl-single,pins = <
-			J784S4_IOPAD(0x09c, PIN_OUTPUT, 7)  /* (AF35) MCASP0_AXR11.SPI2_CS1 */ /* AQUILA D9 */
-		>;
-	};
-
 	/* Aquila I2S_1 (LEDs) */
 	pinctrl_main_mcasp4_gpio: main-mcasp4-gpio-pins {
 		pinctrl-single,pins = <
@@ -35,15 +28,6 @@
 		pinctrl-single,pins = <
 			J784S4_IOPAD(0x0b8, PIN_INPUT, 7)  /* (AC34) MCASP1_ACLKX.MCAN10_RX */ /* AQUILA B49 */
 			J784S4_IOPAD(0x0b4, PIN_INPUT, 7)  /* (AL34) MCASP1_AXR4.MCAN10_TX  */ /* AQUILA B48 */
-		>;
-	};
-
-	/* Aquila SD_1 (Diag) */
-	pinctrl_main_mmc1_gpio: main-mmc1-gpio-pins {
-		pinctrl-single,pins = <
-			J784S4_IOPAD(0x104, PIN_INPUT, 7)  /* (AB38) MMC1_CLK  */ /* AQUILA A5  */
-			J784S4_IOPAD(0x108, PIN_INPUT, 7)  /* (AB36) MMC1_CMD  */ /* AQUILA A7  */
-			J784S4_IOPAD(0x0fc, PIN_INPUT, 7)  /* (AA33) MMC1_DAT0 */ /* AQUILA A3  */
 		>;
 	};
 };
@@ -68,15 +52,6 @@
 	pinctrl_mcu_wkup_gpio0_3: mcu-wkup-gpio0-3-default-pins {
 		pinctrl-single,pins = <
 			J784S4_WKUP_IOPAD(0x064, PIN_INPUT, 7) /* (J36) WKUP_GPIO0_3 */ /* AQUILA C53 */
-		>;
-	};
-
-	// Delete when updated
-	/* Aquila I2C_2 */
-	pinctrl_mcu_i2c1: mcu-i2c1-default-pins {
-		pinctrl-single,pins = <
-			J784S4_WKUP_IOPAD(0x078, PIN_INPUT_PULLUP, 0) /* (L35) WKUP_GPIO0_8.MCU_I2C1_SCL */ /* AQUILA C17 */
-			J784S4_WKUP_IOPAD(0x07c, PIN_INPUT_PULLUP, 0) /* (L34) WKUP_GPIO0_9.MCU_I2C1_SDA */ /* AQUILA C16 */
 		>;
 	};
 };
@@ -121,9 +96,9 @@
 		shunt-resistor = <10000>;
 	};
 
-	peripheral-5v-hwmon@48 { // U6 (requires mod)
+	peripheral-5v-hwmon@48 { // U6
 		compatible = "ti,ina226";
-		reg = <0x48>;
+		reg = <0x4B>;
 		shunt-resistor = <5000>;
 	};
 
@@ -146,7 +121,10 @@
 
 	fan_controller: fan-controller@4d {
 		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_mcu_mcan1_gpio>; // FAN_ALERT
+		pinctrl-0 =
+			<&pinctrl_mcu_mcan1_gpio>, // FAN_ALERT
+			<&pinctrl_gpio_01>, // READ_BATT
+			<&pinctrl_gpio_02>; // BATT_OK
 		compatible = "microchip,emc2305";
 		reg = <0x4D>;
 		#address-cells = <1>;
@@ -225,7 +203,7 @@
 	pinctrl-0 =
 		// SPI and CS pins
 		<&pinctrl_main_spi2>,
-		<&pinctrl_main_spi2_cs0_gpio>, // CS1
+		<&pinctrl_main_spi2_cs0>, // CS1
 		<&pinctrl_gpio_03>, // CS2
 		// Shutter pins
 		<&pinctrl_gpio_08>, // SHUTTER_EN
@@ -233,19 +211,19 @@
 		// Interlock pins
 		<&pinctrl_gpio_10_csi_1>, // INTERLOCK_STATUS_0
 		<&pinctrl_gpio_12_csi_1>; // INTERLOCK_STATUS_1
-	cs-gpios = <&main_gpio0 39 GPIO_ACTIVE_LOW>, <&main_gpio0 29 GPIO_ACTIVE_LOW>;
+	cs-gpios = <&main_gpio0 29 GPIO_ACTIVE_LOW>, <0>;
 
-	laser-modulator-spi@0 {
-		/* Use compatible "rohm,dh2228fv" to bind spidev driver */
+	laser-digipot-spi@0 {
 		reg = <0>;
-		compatible = "rohm,dh2228fv";
-		spi-max-frequency = <30000000>;
-	};
-
-	laser-digipot-spi@1 {
-		reg = <1>;
 		compatible = "microchip,mcp4161-103";
 		spi-max-frequency = <500000>;
+	};
+
+	laser-modulator-spi@1 { // Must be second so that the HW CS is used
+		/* Use compatible "rohm,dh2228fv" to bind spidev driver */
+		reg = <1>;
+		compatible = "rohm,dh2228fv";
+		spi-max-frequency = <30000000>;
 	};
 };
 
@@ -273,42 +251,44 @@
 			<&pinctrl_main_mcan10_gpio>, // DEBUG_SW_0/1
 			<&pinctrl_mcu_mcan0_gpio>, // DEBUG_SW_2/3
 			// Diag
-			<&pinctrl_main_mmc1_gpio>, // DIAG_0/1/3
-			<&pinctrl_sd1_pwr_en>; // DIAG_2
+			<&pinctrl_gpio_13_csi_2>, // DIAG0
+			<&pinctrl_gpio_14_csi_2>, // DIAG1
+			<&pinctrl_gpio_15_csi_2>, // DIAG2
+			<&pinctrl_gpio_16_csi_2>; // DIAG3
 
-		/* LED0 Green */
+		/* LED0 Red */
 		led-0 {
-			color = <LED_COLOR_ID_GREEN>;
+			color = <LED_COLOR_ID_RED>;
 			default-state = "off";
 			function = LED_FUNCTION_STATUS;
 			gpios = <&main_gpio0 50 GPIO_ACTIVE_HIGH>;
-			linux,default-trigger = "heartbeat";
-		};
-
-		/* LED1 Red */
-		led-1 {
-			color = <LED_COLOR_ID_RED>;
-			default-state = "off";
-			function = LED_FUNCTION_STATUS;
-			gpios = <&main_gpio0 27 GPIO_ACTIVE_HIGH>;
 			panic-indicator;
 		};
 
-		/* LED2 Green */
-		led-2 {
+		/* LED1 Green */
+		led-1 {
 			color = <LED_COLOR_ID_GREEN>;
 			default-state = "off";
-			function = LED_FUNCTION_DISK_ACTIVITY;
-			gpios = <&main_gpio0 26 GPIO_ACTIVE_HIGH>;
-			linux,default-trigger = "mmc0";
+			function = LED_FUNCTION_STATUS;
+			gpios = <&main_gpio0 27 GPIO_ACTIVE_HIGH>;
+			linux,default-trigger = "heartbeat";
 		};
 
-		/* LED3 Red */
-		led-3 {
+		/* LED2 Red */
+		led-2 {
 			color = <LED_COLOR_ID_RED>;
 			default-state = "off";
 			function = LED_FUNCTION_STATUS;
+			gpios = <&main_gpio0 26 GPIO_ACTIVE_HIGH>;
+		};
+
+		/* LED3 Green */
+		led-3 {
+			color = <LED_COLOR_ID_GREEN>;
+			default-state = "off";
+			function = LED_FUNCTION_DISK_ACTIVITY;
 			gpios = <&main_gpio0 49 GPIO_ACTIVE_HIGH>;
+			linux,default-trigger = "mmc0";
 		};
 	};
 };
