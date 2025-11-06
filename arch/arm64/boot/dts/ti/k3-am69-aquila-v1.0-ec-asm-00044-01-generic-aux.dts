@@ -24,3 +24,11 @@
 		<&pinctrl_gpio_05>, // RTCPU_MODE_0
 		<&pinctrl_gpio_06>; // RTCPU_MODE_1
 };
+
+&eth2_mdio_gpio {
+	status = "disabled";
+};
+
+&main_cpsw0_port2 {
+	status = "disabled";
+};
