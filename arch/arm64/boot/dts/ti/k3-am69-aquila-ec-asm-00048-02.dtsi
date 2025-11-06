@@ -3,7 +3,7 @@
  * Copyright 2024 Toradex
  * Copyright 2025 Refeyn
  *
- * Device tree for EC-ASM-00048-01 CheckMate Screen Adaptor
+ * Device tree for EC-ASM-00048-02 CheckMate Screen Adaptor
  */
 
 #include <dt-bindings/gpio/gpio.h>
