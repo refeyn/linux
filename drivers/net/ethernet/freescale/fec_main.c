@@ -1904,7 +1904,7 @@ rx_processing_done:
 	rxq->bd.cur = bdp;
 
 	if (xdp_result & FEC_ENET_XDP_REDIR)
-		xdp_do_flush_map();
+		xdp_do_flush();
 
 	return pkt_received;
 }
@@ -2300,7 +2300,8 @@ static void fec_enet_phy_reset_after_clk_enable(struct net_device *ndev)
 		 */
 		phy_dev = of_phy_find_device(fep->phy_node);
 		phy_reset_after_clk_enable(phy_dev);
-		put_device(&phy_dev->mdio.dev);
+		if (phy_dev)
+			put_device(&phy_dev->mdio.dev);
 	}
 }
 
