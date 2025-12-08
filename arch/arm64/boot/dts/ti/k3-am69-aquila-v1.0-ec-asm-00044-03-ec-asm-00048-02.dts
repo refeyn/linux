@@ -3,14 +3,14 @@
  * Copyright (C) 2025 Toradex
  * Copyright 2025 Refeyn
  *
- * Device tree for EC-ASM-00044-02 CheckMate Main Board with EC-ASM-00048-02 CheckMate Screen Adaptor
+ * Device tree for EC-ASM-00044-03 CheckMate Main Board with EC-ASM-00048-02 CheckMate Screen Adaptor
  */
 
-#include "k3-am69-aquila-v1.1-ec-asm-00044-02-generic-aux.dts"
+#include "k3-am69-aquila-v1.1-ec-asm-00044-03-ec-asm-00048-02.dts"
 #include "k3-am69-aquila-v1.0.dtsi"
 
 / {
-	model = "Toradex Aquila AM69 v1.0 on EC-ASM-00044-02 CheckMate Main Board (with no aux board)";
+	model = "Toradex Aquila AM69 v1.0 on EC-ASM-00044-03 CheckMate Main Board with EC-ASM-00048-02 CheckMate Screen Adaptor";
 };
 
 /* Aquila UART_1 (SoM v1.0) */
@@ -31,8 +31,8 @@
 	pinctrl-0 =
 		// SPI and CS pins
 		<&pinctrl_main_spi2>,
-		<&pinctrl_main_spi2_cs0>, // CS1
-		<&pinctrl_gpio_03>, // CS2
+		<&pinctrl_main_spi2_cs0>, // CS1 (HW 1)
+		<&pinctrl_main_spi2_cs1>, // CS2 (HW 0)
 		// Shutter pins
 		<&pinctrl_gpio_08>, // SHUTTER_EN
 		<&pinctrl_mcu_wkup_gpio0_3>, // SHUTTER_ACTIVE

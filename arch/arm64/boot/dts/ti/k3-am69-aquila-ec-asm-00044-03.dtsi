@@ -3,7 +3,7 @@
  * Copyright 2024 Toradex
  * Copyright 2025 Refeyn
  *
- * Device tree for EC-ASM-00044-02 CheckMate Main Board
+ * Device tree for EC-ASM-00044-03 CheckMate Main Board
  */
 
 #include <dt-bindings/gpio/gpio.h>
@@ -28,6 +28,13 @@
 		pinctrl-single,pins = <
 			J784S4_IOPAD(0x0b8, PIN_INPUT, 7)  /* (AC34) MCASP1_ACLKX.MCAN10_RX */ /* AQUILA B49 */
 			J784S4_IOPAD(0x0b4, PIN_INPUT, 7)  /* (AL34) MCASP1_AXR4.MCAN10_TX  */ /* AQUILA B48 */
+		>;
+	};
+
+	/* Aquila PCIE_2_RESET# */
+	pinctrl_main_spi2_cs1: main-spi2-cs1-default-pins {
+		pinctrl-single,pins = <
+			J784S4_IOPAD(0x0a4, PIN_OUTPUT, 10) /* (AJ36) MCASP0_AXR13.SPI2_CS0 */ /* AQUILA C35 */
 		>;
 	};
 };
@@ -96,7 +103,7 @@
 		shunt-resistor = <10000>;
 	};
 
-	peripheral-5v-hwmon@48 { // U6
+	peripheral-5v-hwmon@4b { // U6
 		compatible = "ti,ina226";
 		reg = <0x4B>;
 		shunt-resistor = <5000>;
@@ -202,15 +209,15 @@
 	pinctrl-0 =
 		// SPI and CS pins
 		<&pinctrl_main_spi2>,
-		<&pinctrl_main_spi2_cs0>, // CS1
-		<&pinctrl_gpio_03>, // CS2
+		<&pinctrl_main_spi2_cs0>, // CS1 (HW 1)
+		<&pinctrl_main_spi2_cs1>, // CS2 (HW 0)
 		// Shutter pins
 		<&pinctrl_gpio_08>, // SHUTTER_EN
 		<&pinctrl_mcu_wkup_gpio0_3>, // SHUTTER_ACTIVE
 		// Interlock pins
 		<&pinctrl_gpio_10_csi_1>, // INTERLOCK_STATUS_0
 		<&pinctrl_gpio_12_csi_1>; // INTERLOCK_STATUS_1
-	cs-gpios = <&main_gpio0 29 GPIO_ACTIVE_LOW>, <0>;
+	cs-gpios = <0>, <0>;
 
 	laser-digipot-spi@0 {
 		reg = <0>;
@@ -218,7 +225,7 @@
 		spi-max-frequency = <500000>;
 	};
 
-	laser-modulator-spi@1 { // Must be second so that the HW CS is used
+	laser-modulator-spi@1 {
 		/* Use compatible "rohm,dh2228fv" to bind spidev driver */
 		reg = <1>;
 		compatible = "rohm,dh2228fv";
