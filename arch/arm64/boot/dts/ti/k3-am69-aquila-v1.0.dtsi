@@ -21,6 +21,8 @@
 	reg_3v3_dp: regulator-3v3-dp {
 		pinctrl-names = "default";
 		pinctrl-0 = <&pinctrl_gpio21_dp>;
+		/* Aquila GPIO_21_DP (AQUILA B57) */
+		gpio = <&main_gpio0 37 GPIO_ACTIVE_HIGH>;
 	};
 
 	/* Enabled by EN_3V3_VIO (PMIC_GPIO_9) */
