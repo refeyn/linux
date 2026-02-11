@@ -31,9 +31,11 @@
 		>;
 	};
 
+	/* Aquila SPI_1 CS */
 	/* Aquila PCIE_2_RESET# */
-	pinctrl_main_spi2_cs1: main-spi2-cs1-default-pins {
+	pinctrl_main_spi2_cs: main-spi2-cs1-default-pins {
 		pinctrl-single,pins = <
+			J784S4_IOPAD(0x09c, PIN_OUTPUT, 10) /* (AF35) MCASP0_AXR11.SPI2_CS1 */ /* AQUILA D9 */
 			J784S4_IOPAD(0x0a4, PIN_OUTPUT, 10) /* (AJ36) MCASP0_AXR13.SPI2_CS0 */ /* AQUILA C35 */
 		>;
 	};
@@ -209,8 +211,7 @@
 	pinctrl-0 =
 		// SPI and CS pins
 		<&pinctrl_main_spi2>,
-		<&pinctrl_main_spi2_cs0>, // CS1 (HW 1)
-		<&pinctrl_main_spi2_cs1>, // CS2 (HW 0)
+		<&pinctrl_main_spi2_cs>, // CS1 (HW 1) and CS2 (HW 0)
 		// Shutter pins
 		<&pinctrl_gpio_08>, // SHUTTER_EN
 		<&pinctrl_mcu_wkup_gpio0_3>, // SHUTTER_ACTIVE

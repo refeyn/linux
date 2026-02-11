@@ -31,8 +31,7 @@
 	pinctrl-0 =
 		// SPI and CS pins
 		<&pinctrl_main_spi2>,
-		<&pinctrl_main_spi2_cs0>, // CS1 (HW 1)
-		<&pinctrl_main_spi2_cs1>, // CS2 (HW 0)
+		<&pinctrl_main_spi2_cs>, // CS1 (HW 1) and CS2 (HW 0)
 		// Shutter pins
 		<&pinctrl_gpio_08>, // SHUTTER_EN
 		<&pinctrl_mcu_wkup_gpio0_3>, // SHUTTER_ACTIVE
