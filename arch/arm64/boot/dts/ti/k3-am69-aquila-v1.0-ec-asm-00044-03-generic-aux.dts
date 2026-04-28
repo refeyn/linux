@@ -13,6 +13,11 @@
 	model = "Toradex Aquila AM69 v1.0 on EC-ASM-00044-03 CheckMate Main Board (with no aux board)";
 };
 
+&reg_pwr_control {
+	pinctrl-0 = <&pinctrl_eth2_mdc>;
+	gpio = <&main_gpio0 48 GPIO_ACTIVE_HIGH>;
+};
+
 /* Aquila UART_1 (SoM v1.0) */
 &main_uart1 {
 	status = "okay";

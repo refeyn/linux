@@ -39,6 +39,13 @@
 			J784S4_IOPAD(0x0a4, PIN_OUTPUT, 10) /* (AJ36) MCASP0_AXR13.SPI2_CS0 */ /* AQUILA C35 */
 		>;
 	};
+
+	/* Aquila ETH_2_XGMII_MDIO */
+	pinctrl_pwr_control: pwr-control-default-pins {
+		pinctrl-single,pins = <
+			J784S4_IOPAD(0x058, PIN_OUTPUT, 7) /* (AE37) MCASP2_AFSX.GPIO0_22  */ /* AQUILA B90 */
+		>;
+	};
 };
 
 &wkup_pmx2 {
@@ -66,6 +73,21 @@
 };
 
 // BEGIN POWER CONTROL AND DIAGNOSTICS
+
+/ {
+	reg_pwr_control: regulator-pwr-control {
+		compatible = "regulator-fixed";
+		pinctrl-names = "default";
+		enable-active-high;
+		pinctrl-0 = <&pinctrl_pwr_control>;
+		/* Aquila ETH_2_XGMII_MDIO_MDC (AQUILA B90) */
+		gpio = <&main_gpio0 22 GPIO_ACTIVE_HIGH>;
+		regulator-max-microvolt = <24000000>;
+		regulator-min-microvolt = <24000000>;
+		regulator-name = "POWER_CONTROL";
+		regulator-always-on;
+	};
+};
 
 /* Aquila CTRL_PWR_BTN_MICO# */
 &aquila_key_power {
