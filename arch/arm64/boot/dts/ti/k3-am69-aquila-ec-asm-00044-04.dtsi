@@ -1,0 +1,53 @@
+// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
+/*
+ * Copyright (C) 2025 Toradex
+ * Copyright 2026 Refeyn
+ *
+ * Device tree for EC-ASM-00044-04 CheckMate Main Board
+ */
+
+#include "k3-am69-aquila-ec-asm-00044-03.dtsi"
+
+&main_pmx0 {
+    /* Aquila SPI_2 */
+    pinctrl_main_spi0_gpio: main-spi0-gpio-pins {
+        pinctrl-single,pins = <
+            J784S4_IOPAD(0x0d4, PIN_OUTPUT, 7) /* (AN38) SPI0_CLK.GPIO0_53 */ /* AQUILA D14 */
+            J784S4_IOPAD(0x0d8, PIN_OUTPUT, 7)  /* (AM35) SPI0_D0.GPIO0_54  */ /* AQUILA D15 */
+            J784S4_IOPAD(0x0cc, PIN_INPUT, 7) /* (AM37) SPI0_CS0.GPIO0_51 */ /* AQUILA D16 */
+            J784S4_IOPAD(0x0dc, PIN_INPUT, 7) /* (AM36) SPI0_D1.GPIO0_55  */ /* AQUILA D17 */
+        >;
+    };
+};
+
+&wkup_pmx2 {
+    /* Aquila UART_2 RXD */
+    pinctrl_wkup_uart0_rxd: wkup-uart0-rxd-gpio-pins {
+        pinctrl-single,pins = <
+            J784S4_WKUP_IOPAD(0x048, PIN_INPUT, 7)  /* (K35) WKUP_UART0_RXD.WKUP_GPIO0_58 */ /* AQUILA B31 */
+        >;
+    };
+};
+
+// BEGIN LASER AND SHUTTER CONTROL
+
+/* Aquila SPI_1 */
+&main_spi2 {
+    status = "okay";
+    pinctrl-0 =
+    // SPI and CS pins
+    <&pinctrl_main_spi2>,
+    <&pinctrl_main_spi2_cs>, // CS1 (HW 1) and CS2 (HW 0)
+    // Shutter pins
+    <&pinctrl_gpio_08>, // SHUTTER_EN
+    <&pinctrl_mcu_wkup_gpio0_3>, // SHUTTER_ACTIVE
+    // Interlock pins
+    <&pinctrl_gpio_10_csi_1>, // INTERLOCK_STATUS_0
+    <&pinctrl_gpio_12_csi_1>, // INTERLOCK_STATUS_1
+    // Laser safety pins
+    <&pinctrl_main_spi0_gpio>,
+    // Laser driver board ID
+    <&pinctrl_wkup_uart0_rxd>;
+};
+
+// END
